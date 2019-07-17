@@ -1,10 +1,10 @@
 # Uncommon
 
-This rarity has a modifier `weight` equal to `8`. Uncommon items will have a display name with the colour of `GRAY`. 
+This rarity has a modifier [weight](https://github.com/TheDarkTurnip/dark-dungeon/blob/items/algorithms/modifiers.md#weights) equal to `8`. Uncommon items will have a display name with the colour of `GRAY`. 
 
 Uncommon modifiers include:
 
-- Hasty
-- Spiked
-- Mystic
-- Large
+- [Hasty](https://github.com/TheDarkTurnip/dark-dungeon/blob/items/algorithms/modifiers.md#hasty)
+- [Spiked](https://github.com/TheDarkTurnip/dark-dungeon/blob/items/algorithms/modifiers.md#spiked)
+- [Mystic](https://github.com/TheDarkTurnip/dark-dungeon/blob/items/algorithms/modifiers.md#mystic)
+- [Large](https://github.com/TheDarkTurnip/dark-dungeon/blob/items/algorithms/modifiers.md#large)
