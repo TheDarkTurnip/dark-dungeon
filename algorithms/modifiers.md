@@ -154,35 +154,58 @@ Increases the `protection` by 2.0
 Increases the `damage on staffs` by 5.0
 ### Zealous
 Increases the `movement speed` by 0.06
+
 Increases the `protection` by 2.0
+
 Increases the `damage on bows` by 3.0
+
 Increases the `durability` by 150
+
 Increases the `damage on swords` by 5.0
+
 Increases the `range on staffs` by 4.0
+
 Increases the `damage on staffs` by 5.5
 ### Ruthless
 Increases the `movement speed` by 0.06
 Increases the `luck` by 0.25
+
 Increases the `damage on bows` by 3.0
+
 Increases the `damage on swords` by 5.0
+
 Increases the `range on staffs` by 3.0
+
 Increases the `damage on staffs` by 5.5
 ### Demonic
 Increases the `movement speed` by 0.04
+
 Increases the `luck` by 0.25
+
 Increases the `damage on bows` by 5.0
+
 Increases the `durability` by 150
+
 Increases the `damage on swords` by 6.0
+
 Increases the `range on staffs` by 3.0
+
 Increases the `damage on staffs` by 6.75
 ### Godly
 Increases the `movement speed` by 0.1
+
 Increases the `protection` by 4.0
+
 Increases the `luck` by 0.75
+
 Increases the `damage on bows` by 7.0
+
 Increases the `durability` by 300
+
 Increases the `damage on swords` by 7.0
+
 Increases the `range on staffs` by 5.0
+
 Increases the `damage on staffs` by 7.0
 ### Writable
 Increases the `tokens` to 3.0
