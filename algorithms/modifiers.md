@@ -58,3 +58,132 @@ for (Modifiers modifier : Modifiers.values()) {
 }
 ```
 
+## Weights
+
+This is the source code that determines the weight of ALL modfiers:
+
+``` java
+switch (this) {
+case FLEETING:
+case HARD:
+case PRECISE:
+case SIGHTED:
+case STABLE:
+case JAGGED:
+	return 10;
+case GUARDING:
+case HASTY:
+case SPIKED:
+case MYSTIC:
+case LARGE:
+	return 8;
+case ANGRY:
+case ARMORED:
+case LUCKY:
+case STURDY:
+case STAUNCH:
+case MANIC:
+	return 7;
+case MENACING:
+case QUICK:
+case CELESTIAL:
+case MASSIVE:
+case WARDING:
+	return 6;
+case MYTHICAL:
+case ZEALOUS:
+case RUTHLESS:
+	return 3;
+case DEMONIC:
+	return 2;
+case GODLY:
+	return 1;
+case WRITABLE:
+	return 0;
+default: return 10;
+}
+```
+
+## Modifier Effects
+
+### Fleeting
+Increases the `movement speed` by 0.02
+### Hard
+Increases the `protection` by 0.5
+### Precise
+Increases the `luck` by 0.5
+### Sighted
+Increases the `damage on bows` by 1.0
+### Stable
+Increases the `durability` by 100
+### Jagged
+Increases the `damage on swords` by 1.0
+### Guarding
+Increases the `protection` by 1.0
+### Hasty
+Increases the `movement speed` by 0.04
+### Spiked
+Increases the `damage on swords` by 2.0
+### Mystic
+Increases the `damage on staffs` by 1.5
+### Large
+Increases the `range on staffs` by 1.0
+### Angry
+Increases the `damage on swords` by 3.0
+### Armored
+Increases the `protection` by 1.5
+### Lucky
+Increases the `luck` by 1.0
+### Sturdy
+Increases the `durability` by 200
+### Staunch
+Increases the `damage on bows` by 2.0
+### Manic
+Increases the `damage on staffs` by 2.5
+### Menacing
+Increases the `damage on swords` by 4.0
+### Quick
+Increases the `movement speed` by 0.06
+### Celestial
+Increases the `damage on staffs` by 3.5
+### Massive
+Increases the `range on staffs` by 2.0
+### Warding
+Increases the `protection` by 2.0
+### Mythical
+Increases the `damage on staffs` by 5.0
+### Zealous
+Increases the `movement speed` by 0.06
+Increases the `protection` by 2.0
+Increases the `damage on bows` by 3.0
+Increases the `durability` by 150
+Increases the `damage on swords` by 5.0
+Increases the `range on staffs` by 4.0
+Increases the `damage on staffs` by 5.5
+### Ruthless
+Increases the `movement speed` by 0.06
+Increases the `luck` by 0.25
+Increases the `damage on bows` by 3.0
+Increases the `damage on swords` by 5.0
+Increases the `range on staffs` by 3.0
+Increases the `damage on staffs` by 5.5
+### Demonic
+Increases the `movement speed` by 0.04
+Increases the `luck` by 0.25
+Increases the `damage on bows` by 5.0
+Increases the `durability` by 150
+Increases the `damage on swords` by 6.0
+Increases the `range on staffs` by 3.0
+Increases the `damage on staffs` by 6.75
+### Godly
+Increases the `movement speed` by 0.1
+Increases the `protection` by 4.0
+Increases the `luck` by 0.75
+Increases the `damage on bows` by 7.0
+Increases the `durability` by 300
+Increases the `damage on swords` by 7.0
+Increases the `range on staffs` by 5.0
+Increases the `damage on staffs` by 7.0
+### Writable
+Increases the `tokens` to 3.0
+
