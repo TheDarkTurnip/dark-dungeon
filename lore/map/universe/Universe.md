@@ -8,6 +8,6 @@ _written by Meister Langsam_
 
 ## The universe
 
-![Universe Map](https://github.com/TheDarkTurnip/dark-dungeon/tree/master/lore/maps/universe/universe-map.png)
+![Universe Map](https://raw.githubusercontent.com/TheDarkTurnip/dark-dungeon/master/lore/map/universe/universe-map.png)
 
 At the centre of the universe is the sun. In the centre of the sun, is the eternal spirits fight each other, light and dark. This creates the immense amount of light seen. Surrounding the sun, we have 4 planets, and then the infinite void. `Ramus Humum` is the most similar to Earth, and is where human's reside, and where the race of `turnips` once prospered. `Nixmundi`, the furthest planet, is also the coldest. `Ignisundim`, the "planet on fire", is the closest to the sun. And `Haranae`, is similar distance as `Ramus Humum`, but is covered in sand.
