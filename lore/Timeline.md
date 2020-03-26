@@ -3,6 +3,8 @@ CE: Creation Era
 
 BE: Beginning Era
 
+PE: Present Era
+
 ## Creation Era
 
 0CE:
@@ -29,3 +31,20 @@ BE: Beginning Era
 
 200BE:
 - First documented contact between the Ramus Humum inhabitants and the light spirits
+
+350BE:
+- The being known as `Schlocius` entraps one of the light spirits, the last one ever seen.
+
+355BE:
+- `Schlocius`'s light spirit stops shining
+- `Schlocius` is greeted in a dream by a large angelic being, and claims that his race will be exterminated for his entrapment.
+
+400BE:
+- People all over `Ramus Humum` begin decomposing into turnips, they are buried underground by their families.
+
+450BE:
+- The final inhabitant of `Ramus Humum` decomposes, `Atronia`, who's turnip remain is left above ground.
+
+##Present Era
+0PE:
+- Humans awaken.
