@@ -1,0 +1,18 @@
+task delete(type: Delete) {
+    doFirst {
+        delete "jars"
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    task copy(type: Copy) {
+        from("/build/libs")
+        into("../jars")
+
+    }
+    compileJava.finalizedBy(copy)
+    compileJava.options.encoding = "UTF-8"
+
+}

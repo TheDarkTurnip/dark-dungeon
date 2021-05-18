@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.system.module.type="sourceSet" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="minecraft" name="Minecraft">
+      <configuration>
+        <autoDetectTypes>
+          <platformType>SPIGOT</platformType>
+        </autoDetectTypes>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output-test url="file://$MODULE_DIR$/../../../plugin-dark-lib/build/classes/java/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../plugin-dark-lib/src/test/java">
+      <sourceFolder url="file://$MODULE_DIR$/../../../plugin-dark-lib/src/test/java" isTestSource="true" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../plugin-dark-lib/src/test/resources">
+      <sourceFolder url="file://$MODULE_DIR$/../../../plugin-dark-lib/src/test/resources" type="java-test-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="dark-spawners.plugin-dark-lib.main" />
+    <orderEntry type="module" module-name="dark-spawners.plugin-dark-lib.test" scope="RUNTIME" production-on-test="" />
+  </component>
+  <component name="TestModuleProperties" production-module="dark-spawners.plugin-dark-items.main" />
+</module>

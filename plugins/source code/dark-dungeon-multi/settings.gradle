@@ -1,0 +1,8 @@
+rootProject.name = 'dark-dungeon-multi'
+include ':plugin-dark-world'
+include ':plugin-dark-generator'
+include ':plugin-dark-portal'
+include ':plugin-dark-spawners'
+include ':plugin-dark-lib'
+include ':plugin-dark-items'
+include ':plugin-dark-npc'
