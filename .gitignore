@@ -1,7 +1,7 @@
 # From https://github.com/github/gitignore/blob/master/Gradle.gitignore
 .gradle
 /build/
-
+/.idea
 # Ignore Gradle GUI config
 gradle-app.setting
 
@@ -53,7 +53,6 @@ hs_err_pid*
 .idea/gradle.xml
 .idea/libraries
 
-.idea/
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml
 
@@ -104,3 +103,5 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+*.xml
+*.iml
