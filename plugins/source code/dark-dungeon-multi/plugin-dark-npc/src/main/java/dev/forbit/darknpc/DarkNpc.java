@@ -1,6 +1,7 @@
 package dev.forbit.darknpc;
 
 import dev.forbit.darknpc.areas.AreaAPI;
+import dev.forbit.darknpc.areas.PlayerArea;
 import dev.forbit.generator.plugin.Generator;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +19,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public final class DarkNpc extends JavaPlugin implements Listener {
 
     @Getter @Setter private static AreaAPI API;
     @Getter @Setter private NPCLib library;
+    @Getter private HashMap<UUID, PlayerArea> playerAreas = new HashMap<>();
 
     @Override public void onEnable() {
         setLibrary(new NPCLib(this));
@@ -55,7 +59,7 @@ public final class DarkNpc extends JavaPlugin implements Listener {
 
     @EventHandler public void onJoin(PlayerJoinEvent event) {
         getAPI().initArea(event.getPlayer().getUniqueId());
-        getLogger().info("made npcs for "+event.getPlayer().getName());
+        //getLogger().info("made npcs for "+event.getPlayer().getName());
     }
 
     @EventHandler public void onLeave(PlayerQuitEvent event) {
@@ -78,7 +82,7 @@ public final class DarkNpc extends JavaPlugin implements Listener {
             NPC npc = event.getNPC();
             Player player = event.getWhoClicked();
             if (ChatColor.stripColor(npc.getText().get(0)).equals("NPC Manager")) {
-                getAPI().getManagerMenu().show(player);
+                getAPI().getManagerMenu(getAPI().getArea(event.getWhoClicked())).show(player);
             }
         }
     }

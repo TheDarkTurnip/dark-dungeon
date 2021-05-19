@@ -199,10 +199,9 @@ public class Utils {
             if (currentLength > length) {
                 list.add(builder.toString().trim());
                 builder = new StringBuilder();
-                currentLength = 0;
-            } else {
-                builder.append(str).append(" ");
+                currentLength = ChatColor.stripColor(str).length();
             }
+            builder.append(str).append(" ");
         }
         list.add(builder.toString().trim());
         return list;

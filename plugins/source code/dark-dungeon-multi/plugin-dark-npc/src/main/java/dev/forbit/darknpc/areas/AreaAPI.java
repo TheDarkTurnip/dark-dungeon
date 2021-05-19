@@ -19,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -46,25 +47,38 @@ public class AreaAPI {
             npc.show(Bukkit.getOfflinePlayer(id).getPlayer());
             npcs.put(npc, Bukkit.getOfflinePlayer(id));
         });
+        getMain().getPlayerAreas().put(id, area);
+    }
+
+    public PlayerArea getArea(OfflinePlayer oPlayer) {
+        if (!getMain().getPlayerAreas().containsKey(oPlayer.getUniqueId())) {
+            getMain().getPlayerAreas().put(oPlayer.getUniqueId(), new PlayerArea());
+        }
+
+        return getMain().getPlayerAreas().get(oPlayer.getUniqueId());
     }
 
 
     /* UNLOCK NPC MENU */
-    public DarkMenu getUnlockNPCMenu() {
+    public DarkMenu getUnlockNPCMenu(PlayerArea area) {
         DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Unlock NPCs");
-        menu.addItem(getUnlockItem(NPCType.FARMER), 2);
-        menu.addItem(getUnlockItem(NPCType.SMITH), 3);
-        menu.addItem(getUnlockItem(NPCType.HEALER), 4);
-        menu.addItem(getUnlockItem(NPCType.ALCHEMIST), 5);
-        menu.addItem(getUnlockItem(NPCType.GUILD_REP), 6);
-        menu.addItem(getUnlockItem(NPCType.INFUSER), 12);
-        menu.addItem(getUnlockItem(NPCType.ADV_ITEM_SMITH), 13);
-        menu.addItem(getUnlockItem(NPCType.ENCHANTER), 14);
+        menu.addItem(getUnlockItem(NPCType.FARMER, area), 2);
+        menu.addItem(getUnlockItem(NPCType.SMITH, area), 3);
+        menu.addItem(getUnlockItem(NPCType.HEALER, area), 4);
+        menu.addItem(getUnlockItem(NPCType.ALCHEMIST, area), 5);
+        menu.addItem(getUnlockItem(NPCType.GUILD_REP, area), 6);
+        menu.addItem(getUnlockItem(NPCType.INFUSER, area), 12);
+        menu.addItem(getUnlockItem(NPCType.ADV_ITEM_SMITH, area), 13);
+        menu.addItem(getUnlockItem(NPCType.ENCHANTER, area), 14);
         return menu;
     }
 
-    public MenuNavItem getUnlockItem(NPCType t) {
-        return new MenuNavItem(t.getMenuMaterial(), "&d" + t.getTitle(), null, getUnlockMenu(t));
+    public MenuItem getUnlockItem(NPCType t, PlayerArea area) {
+        if (area.getArea(t).getLevel() > 0) {
+            return new BasicItem(t.getMenuMaterial(), "&7" + t.getTitle(), "&8Already Unlocked", null);
+        } else {
+            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUnlockMenu(t));
+        }
     }
 
     public DarkMenu getUnlockMenu(NPCType t) {
@@ -76,51 +90,87 @@ public class AreaAPI {
 
 
     /* UPGRADE AREA MENU */
-    public DarkMenu getUpgradeNPCMenu() {
+    public DarkMenu getUpgradeNPCMenu(PlayerArea area) {
         DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Upgrade NPCs");
-        menu.addItem(getUpgradeItem(NPCType.FARMER), 2);
-        menu.addItem(getUpgradeItem(NPCType.SMITH), 3);
-        menu.addItem(getUpgradeItem(NPCType.HEALER), 4);
-        menu.addItem(getUpgradeItem(NPCType.ALCHEMIST), 5);
-        menu.addItem(getUpgradeItem(NPCType.GUILD_REP), 6);
-        menu.addItem(getUpgradeItem(NPCType.INFUSER), 12);
-        menu.addItem(getUpgradeItem(NPCType.ADV_ITEM_SMITH), 13);
-        menu.addItem(getUpgradeItem(NPCType.ENCHANTER), 14);
+        menu.addItem(getUpgradeItem(NPCType.FARMER, area), 2);
+        menu.addItem(getUpgradeItem(NPCType.SMITH, area), 3);
+        menu.addItem(getUpgradeItem(NPCType.HEALER, area), 4);
+        menu.addItem(getUpgradeItem(NPCType.ALCHEMIST, area), 5);
+        menu.addItem(getUpgradeItem(NPCType.GUILD_REP, area), 6);
+        menu.addItem(getUpgradeItem(NPCType.INFUSER, area), 12);
+        menu.addItem(getUpgradeItem(NPCType.ADV_ITEM_SMITH, area), 13);
+        menu.addItem(getUpgradeItem(NPCType.ENCHANTER, area), 14);
         return menu;
     }
 
-    public MenuNavItem getUpgradeItem(NPCType t) {
-        return new MenuNavItem(t.getMenuMaterial(), "&d" + t.getTitle(), null, getUpgradeMenu(t));
+    public MenuItem getUpgradeItem(NPCType t, PlayerArea area ) {
+        int currentLevel = area.getArea(t).getLevel();
+        if (currentLevel <= 0) {
+            return new BasicItem(t.getMenuMaterial(), "&c" + t.getTitle(), "&4You need to unlock &4this NPC first!", null);
+        } else {
+            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUpgradeMenu(t, currentLevel));
+        }
     }
 
-    public DarkMenu getUpgradeMenu(NPCType t) {
-        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Upgrade "+t.getTitle()+" NPC to level x?");
+    public DarkMenu getUpgradeMenu(NPCType t, int currentLevel) {
+        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Upgrade "+t.getTitle()+" to level "+(currentLevel+1)+"?");
         menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, null), 2);
         menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 6);
-        menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&8Cost: &7"+3000+" silver", null, null), 4);
+        menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Cost", "&7"+(currentLevel*1000)+" silver", null), 4);
         return menu;
     }
 
     /* MANAGE AREA MENU */
-    public DarkMenu getManageAreasMenu() {
+    public DarkMenu getManageAreasMenu(PlayerArea area) {
         DarkMenu menu = new DarkMenu(ChatColor.DARK_PURPLE+"Manage Areas");
         for (int i = 0; i < 7; i++) {
-            menu.addItem(getAreaItem(i), i+1);
+            menu.addItem(getAreaItem(i, area), i+1);
+        }
+        menu.addItem(new BasicItem(Material.BLACK_STAINED_GLASS_PANE, "", null, null), 0);
+        menu.addItem(new BasicItem(Material.BLACK_STAINED_GLASS_PANE, "", null, null), 8);
+        return menu;
+    }
+
+    public MenuItem getAreaItem(int id, PlayerArea area) {
+        if (area.getUnlockedAreas() < id) return new BasicItem(Material.RED_STAINED_GLASS_PANE, "Area "+(id+1), "&4You need to unlock &4this area first!", null);
+        if (area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
+            return new MenuNavItem(Material.GRAY_STAINED_GLASS_PANE, "Area "+(id+1), "&8This area is empty!", getManageAreaMenu(null, area));
+        } else {
+            NPCType type = area.getCurrentAreas().get(id);
+            return new MenuNavItem(type.getMenuMaterial(), type.getTitle(), null, getManageAreaMenu(area.getArea(type), area));
+        }
+    }
+
+    /* SPECIFIC AREA MANAGEMENT MENU */
+    public DarkMenu getManageAreaMenu(@Nullable Area area, PlayerArea playerArea) {
+        DarkMenu menu;
+        if (area == null) {
+            menu = new DarkMenu("Managing area");
+            menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 2);
+            menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", "&4There is no NPC at &4this area!", null), 4);
+            menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, null), 6);
+        } else {
+            menu = new DarkMenu("Manage " + area.getType().getTitle() + " Area");
+            if (area.getType() != null) {
+                menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", null, null), 2);
+                menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", null, null), 4);
+                menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", "&4There is already &4an NPC here!", null), 6);
+            }
+            else {
+                menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 2);
+                menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", "&4There is no NPC at &4this area!", null), 4);
+                menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, null), 6);
+            }
         }
         return menu;
     }
 
-    public MenuItem getAreaItem(int id) {
-        return new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "Area "+id, null, null);
-    }
-
     /* NPC MANAGER MENU */
-    public DarkMenu getManagerMenu() {
+    public DarkMenu getManagerMenu(PlayerArea playerArea) {
         DarkMenu menu = new DarkMenu(ChatColor.RED+"Manage NPCs");
-        menu.addItem(new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu()), 2);
-        menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu()), 4);
-        menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu()), 6);
-
+        menu.addItem(new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu(playerArea)), 2);
+        menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu(playerArea)), 4);
+        menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu(playerArea)), 6);
         return menu;
     }
 }

@@ -3,4 +3,4 @@ version: @version@
 main: dev.forbit.darknpc.DarkNpc
 api-version: 1.16
 description: Plugin for handling NPCs for player areas.
-depend: [dark-generator, dark-lib]
+depend: [dark-generator, dark-lib, NPCLibPlugin]

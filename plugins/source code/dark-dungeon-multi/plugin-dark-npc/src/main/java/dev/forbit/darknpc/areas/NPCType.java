@@ -18,6 +18,7 @@ public enum NPCType {
     @Getter @Setter boolean level;
     @Getter @Setter Material menuMaterial;
     @Getter @Setter String title;
+
     NPCType(String schem, boolean Level, Material menuMaterial, String title) {
         setSchemName(schem);
         setLevel(level);
