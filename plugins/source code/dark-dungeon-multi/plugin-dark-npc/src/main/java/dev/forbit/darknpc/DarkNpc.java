@@ -78,7 +78,7 @@ public final class DarkNpc extends JavaPlugin implements Listener {
             NPC npc = event.getNPC();
             Player player = event.getWhoClicked();
             if (ChatColor.stripColor(npc.getText().get(0)).equals("NPC Manager")) {
-                getAPI().getUnlockNPCMenu().show(player);
+                getAPI().getManagerMenu().show(player);
             }
         }
     }

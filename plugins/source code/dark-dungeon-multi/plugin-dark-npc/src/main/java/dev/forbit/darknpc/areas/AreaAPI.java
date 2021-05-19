@@ -5,6 +5,7 @@ import dev.forbit.generator.plugin.Generator;
 import dev.forbit.generator.plugin.Position;
 import dev.forbit.library.Utils;
 import dev.forbit.library.menu.DarkMenu;
+import dev.forbit.library.menu.MenuItem;
 import dev.forbit.library.menu.type.BasicItem;
 import dev.forbit.library.menu.type.MenuNavItem;
 import lombok.Getter;
@@ -47,6 +48,8 @@ public class AreaAPI {
         });
     }
 
+
+    /* UNLOCK NPC MENU */
     public DarkMenu getUnlockNPCMenu() {
         DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Unlock NPCs");
         menu.addItem(getUnlockItem(NPCType.FARMER), 2);
@@ -68,6 +71,56 @@ public class AreaAPI {
         DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Unlock "+t.getTitle()+" NPC?");
         menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, null), 2);
         menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 6);
+        return menu;
+    }
+
+
+    /* UPGRADE AREA MENU */
+    public DarkMenu getUpgradeNPCMenu() {
+        DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Upgrade NPCs");
+        menu.addItem(getUpgradeItem(NPCType.FARMER), 2);
+        menu.addItem(getUpgradeItem(NPCType.SMITH), 3);
+        menu.addItem(getUpgradeItem(NPCType.HEALER), 4);
+        menu.addItem(getUpgradeItem(NPCType.ALCHEMIST), 5);
+        menu.addItem(getUpgradeItem(NPCType.GUILD_REP), 6);
+        menu.addItem(getUpgradeItem(NPCType.INFUSER), 12);
+        menu.addItem(getUpgradeItem(NPCType.ADV_ITEM_SMITH), 13);
+        menu.addItem(getUpgradeItem(NPCType.ENCHANTER), 14);
+        return menu;
+    }
+
+    public MenuNavItem getUpgradeItem(NPCType t) {
+        return new MenuNavItem(t.getMenuMaterial(), "&d" + t.getTitle(), null, getUpgradeMenu(t));
+    }
+
+    public DarkMenu getUpgradeMenu(NPCType t) {
+        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Upgrade "+t.getTitle()+" NPC to level x?");
+        menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, null), 2);
+        menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 6);
+        menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&8Cost: &7"+3000+" silver", null, null), 4);
+        return menu;
+    }
+
+    /* MANAGE AREA MENU */
+    public DarkMenu getManageAreasMenu() {
+        DarkMenu menu = new DarkMenu(ChatColor.DARK_PURPLE+"Manage Areas");
+        for (int i = 0; i < 7; i++) {
+            menu.addItem(getAreaItem(i), i+1);
+        }
+        return menu;
+    }
+
+    public MenuItem getAreaItem(int id) {
+        return new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "Area "+id, null, null);
+    }
+
+    /* NPC MANAGER MENU */
+    public DarkMenu getManagerMenu() {
+        DarkMenu menu = new DarkMenu(ChatColor.RED+"Manage NPCs");
+        menu.addItem(new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu()), 2);
+        menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu()), 4);
+        menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu()), 6);
+
         return menu;
     }
 }
