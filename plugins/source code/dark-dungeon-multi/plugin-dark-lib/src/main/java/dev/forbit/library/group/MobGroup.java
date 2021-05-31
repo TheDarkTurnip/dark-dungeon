@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * The Different MobGroups present on DarkDungeon
+ */
 public enum MobGroup {
     ZOMBIE("AdvDrowned", "AdvZombie", "BasicDrowned", "BasicHusk", "BasicZombie", "CorruptedZombie", "EnlightenedZombie", "TurnipZombie", "GoldZombie", "JungleMinion"),
     SKELETON("AdvArcher", "AdvSkeleton", "ArcherMinion", "BasicSkeleton"),

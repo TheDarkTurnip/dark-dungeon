@@ -8,8 +8,13 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.20/18bcea7d5df4d49227b4a0743a536208ce4825bb/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="dark-items.plugin-dark-lib.main" />
-        <module name="dark-items.main" />
+        <module name="dark-dungeon-multi.plugin-dark-lib.main" />
+        <module name="dark-dungeon-multi.plugin-dark-portal.main" />
+        <module name="dark-dungeon-multi.plugin-dark-spawners.main" />
+        <module name="dark-dungeon-multi.plugin-dark-world.main" />
+        <module name="dark-dungeon-multi.plugin-dark-npc.main" />
+        <module name="dark-dungeon-multi.plugin-dark-generator.main" />
+        <module name="dark-dungeon-multi.plugin-dark-items.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">

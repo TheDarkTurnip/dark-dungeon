@@ -42,8 +42,8 @@ public class PlayerArea {
     }
 
     /**
-     *
      * @param type NPCType the type of npc
+     *
      * @return reference to the area class of NPC type
      *
      * @throws IllegalArgumentException if type is found to not have a corresponding area inside {#areas}
@@ -55,5 +55,19 @@ public class PlayerArea {
             }
         }
         throw new IllegalArgumentException("type was not found to have a corresponding area");
+    }
+
+    /**
+     * Gets a list of NPC's that haven't been added
+     *
+     * @return
+     */
+    public List<NPCType> getAvailableNPCS() {
+        List<NPCType> list = new ArrayList<>(List.of(NPCType.values()));
+        for (Area area : getAreas()) {
+            NPCType type = area.getType();
+            if (getCurrentAreas().containsValue(type) || area.getLevel() <= 0) { list.remove(type); }
+        }
+        return list;
     }
 }

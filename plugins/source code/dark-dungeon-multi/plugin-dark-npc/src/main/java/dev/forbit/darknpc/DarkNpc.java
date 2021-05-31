@@ -41,6 +41,8 @@ public final class DarkNpc extends JavaPlugin implements Listener {
                     OfflinePlayer offlinePlayer = getAPI().getNpcs().get(npc);
                     if (!offlinePlayer.isOnline()) { continue; }
                     Player player = offlinePlayer.getPlayer();
+                    assert(player != null);
+                    if (!(player.getWorld().equals(npc.getWorld()))) { continue; } // check if they're in the same world.
                     if (player.getLocation().distanceSquared(npc.getLocation()) < 500) {
                         npc.lookAt(player.getEyeLocation().add(0,-1.25,0));
                     } else {
