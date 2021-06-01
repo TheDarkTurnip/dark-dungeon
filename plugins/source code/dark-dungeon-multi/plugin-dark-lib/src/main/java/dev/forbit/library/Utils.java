@@ -188,12 +188,25 @@ public class Utils {
         return damage * Math.pow(0.97, piercedArmor);
     }
 
+    /**
+     * Splits a string into multiple lines.
+     * Use #{newline} with spaces on either side to indicate a new line.
+     * @param string
+     * @param length
+     * @return
+     */
     public static List<String> splitString(String string, int length) {
         String[] words = string.split(" ");
         int currentLength = 0;
         StringBuilder builder = new StringBuilder();
         List<String> list = new ArrayList<>();
         for (String s : words) {
+            if (s.equals("#{newline}")) {
+                list.add(builder.toString().trim());
+                builder = new StringBuilder();
+                currentLength = 0;
+                continue;
+            }
             String str = ChatColor.translateAlternateColorCodes('&', s);
             currentLength += ChatColor.stripColor(str).length();
             if (currentLength > length) {

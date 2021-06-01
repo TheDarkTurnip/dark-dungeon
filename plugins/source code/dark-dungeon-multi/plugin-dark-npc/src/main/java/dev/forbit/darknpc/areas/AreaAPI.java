@@ -149,35 +149,33 @@ public class AreaAPI {
 
     public MenuItem getAreaItem(DarkMenu previousMenu, int id, PlayerArea area) {
         if (area.getUnlockedAreas() < id) { return new BasicItem(Material.RED_STAINED_GLASS_PANE, "Area " + (id + 1), "&4You need to unlock &4this area first!", null); }
-        if (area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
-            return new MenuNavItem(Material.GRAY_STAINED_GLASS_PANE, "Area " + (id + 1), "&8This area is empty!", getManageAreaMenu(previousMenu, null, area));
+        if (!area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
+            return new MenuNavItem(Material.GRAY_STAINED_GLASS_PANE, "Area " + (id + 1), "&8This area is empty!", getManageAreaMenu(previousMenu, null, area, id));
         }
         else {
             NPCType type = area.getCurrentAreas().get(id);
-            return new MenuNavItem(type.getMenuMaterial(), type.getTitle(), null, getManageAreaMenu(previousMenu, area.getArea(type), area));
+            return new MenuNavItem(type.getMenuMaterial(), "Area "+(id+1), "&7NPC: &5"+type.getTitle()+" #{newline} &7Level: &d"+area.getArea(type).getLevel(), getManageAreaMenu(previousMenu, area.getArea(type), area, id));
         }
     }
 
     /* SPECIFIC AREA MANAGEMENT MENU */
-    public DarkMenu getManageAreaMenu(DarkMenu manageAreaMenu, @Nullable Area area, PlayerArea playerArea) {
+    public DarkMenu getManageAreaMenu(DarkMenu manageAreaMenu, @Nullable Area area, PlayerArea playerArea, int id) {
         DarkMenu menu;
-        if (area == null) {
+        if (area == null || area.getType() == null) {
             menu = new DarkMenu("Managing area");
-            menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 2);
-            menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", "&4There is no NPC at &4this area!", null), 4);
-            menu.addItem(new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, getAddNPCMenu(menu, playerArea)), 6);
+            menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 3);
+            menu.addItem(new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, getAddNPCMenu(menu, id, playerArea)), 5);
         }
         else {
             menu = new DarkMenu("Manage " + area.getType().getTitle() + " Area");
             if (area.getType() != null) {
-                menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", null, null), 2);
-                menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", null, null), 4);
-                menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", "&4There is already &4an NPC here!", null), 6);
-            }
-            else {
-                menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 2);
-                menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", "&4There is no NPC at &4this area!", null), 4);
-                menu.addItem(new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, getAddNPCMenu(menu, playerArea)), 6);
+                menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", null, () -> {
+                    playerArea.clear(id);
+                    getManageAreasMenu(getManagerMenu(playerArea), playerArea).show(manageAreaMenu.getPlayer());
+                }), 3);
+                // IDEA could just remove this?
+                //menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", null, null), 4); // TODO change npc (select npc to add except remove old npc once selected)
+                menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", "&4There is already an &4NPC here!", null), 5);
             }
         }
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, manageAreaMenu), 0);
@@ -185,13 +183,16 @@ public class AreaAPI {
     }
 
     /* ADD NPC MENU */
-    public DarkMenu getAddNPCMenu(DarkMenu managerAreasMenu, PlayerArea playerArea) {
+    public DarkMenu getAddNPCMenu(DarkMenu managerAreasMenu, int id, PlayerArea playerArea) {
         DarkMenu menu = new DarkMenu(ChatColor.GREEN + "Add NPC to Area");
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, managerAreasMenu), 0);
         List<NPCType> list = playerArea.getAvailableNPCS();
         int pos = 1;
         for (NPCType type : list) {
-            menu.addItem(new BasicItem(type.getMenuMaterial(), "&a" + type.getTitle(), "&7Level &d"+playerArea.getArea(type).getLevel(), null), pos++);
+            menu.addItem(new BasicItem(type.getMenuMaterial(), "&a" + type.getTitle(), "&7Level &d"+playerArea.getArea(type).getLevel(), () -> {
+                playerArea.setArea(id, type);
+                getManageAreasMenu(getManagerMenu(playerArea), playerArea).show(managerAreasMenu.getPlayer());
+            }), pos++);
         }
         return menu;
     }
