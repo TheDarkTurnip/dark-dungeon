@@ -1,11 +1,24 @@
 package dev.forbit.darknpc.areas;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +54,22 @@ public class PlayerArea {
         return loc;
     }
 
+
+    // WORLD EDIT PASTING STUFF
+    public void pasteArea(Area area, int areaID) {
+        AreaOffset offset = AreaOffset.getOffset(areaID + 1);
+        String schematic = area.getSchematic();
+        Location location = getLocation().clone().add(offset.getXOffset(), offset.getYOffset(), offset.getZOffset());
+        String fileName = ("plugins/FastAsyncWorldEdit/schematics/areas/" + schematic + ".schem");
+        AreaAPI.pasteArea(fileName, location);
+    }
+
+    public void clearArea(int areaID) {
+        AreaOffset offset = AreaOffset.getOffset(areaID + 1);
+        Location location = getLocation().clone().add(offset.getXOffset(), offset.getYOffset(), offset.getZOffset());
+        AreaAPI.pasteArea("plugins/FastAsyncWorldEdit/schematics/areas/blank_area.schem", location);
+    }
+
     /**
      * @param type NPCType the type of npc
      *
@@ -55,6 +84,20 @@ public class PlayerArea {
             }
         }
         throw new IllegalArgumentException("type was not found to have a corresponding area");
+    }
+
+    public int getPosition(Area area) {
+        for (int i : getCurrentAreas().keySet()) {
+            if (getCurrentAreas().get(i).equals(area.getType())) return i;
+        }
+        throw new ArrayIndexOutOfBoundsException("Could not find current area index for area "+area+" (NPCTYPE: "+area.getType().name());
+    }
+
+    public int getPosition(NPCType type) {
+        for (int i : getCurrentAreas().keySet()) {
+            if (getCurrentAreas().get(i).equals(type)) return i;
+        }
+        throw new ArrayIndexOutOfBoundsException("Could not find current area index for NPC type: "+type.name());
     }
 
     /**
@@ -73,6 +116,7 @@ public class PlayerArea {
 
     /**
      * Unlocks an npc
+     *
      * @param t
      */
     public void unlockNPC(NPCType t) {
@@ -81,28 +125,39 @@ public class PlayerArea {
 
     /**
      * Upgrades an NPC's level
+     *
      * @param t
      */
     public boolean upgrade(NPCType t) {
-        if (getArea(t) == null || getArea(t).getLevel() <= 0) return false;
-        getArea(t).setLevel(getArea(t).getLevel()+1);
+        if (getArea(t) == null || getArea(t).getLevel() <= 0) { return false; }
+        getArea(t).setLevel(getArea(t).getLevel() + 1);
+
+        //update if being used currently.
+        if (getCurrentAreas().containsValue(t)) {
+            int position = getPosition(t);
+            pasteArea(getArea(t), position);
+        }
         return true;
     }
 
     /**
      * Sets the npc at area #id to type type
+     *
      * @param id
      * @param type
      */
     public void setArea(int id, NPCType type) {
         getCurrentAreas().put(id, type);
+        pasteArea(getArea(type), id);
     }
 
     /**
      * Clear the area at #id
+     *
      * @param id
      */
     public void clear(int id) {
         getCurrentAreas().remove(id);
+        clearArea(id);
     }
 }

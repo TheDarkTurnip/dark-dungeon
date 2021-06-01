@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 
+/**
+ * TODO add max levels
+ */
 public enum NPCType {
     FARMER("farmhouse", true, Material.WHEAT, "Farmer"),
     SMITH("", true, Material.ANVIL, "Item Smith"),
@@ -19,7 +22,7 @@ public enum NPCType {
     @Getter @Setter Material menuMaterial;
     @Getter @Setter String title;
 
-    NPCType(String schem, boolean Level, Material menuMaterial, String title) {
+    NPCType(String schem, boolean level, Material menuMaterial, String title) {
         setSchemName(schem);
         setLevel(level);
         setMenuMaterial(menuMaterial);

@@ -1,5 +1,16 @@
 package dev.forbit.darknpc.areas;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import dev.forbit.darknpc.DarkNpc;
 import dev.forbit.generator.plugin.Generator;
 import dev.forbit.generator.plugin.Position;
@@ -20,12 +31,15 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * REFACTOR refactor the menu mess.
+ *
  */
 public class AreaAPI {
     @Getter DarkNpc main;
@@ -204,5 +218,39 @@ public class AreaAPI {
         menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu(menu, playerArea)), 4);
         menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu(menu, playerArea)), 6);
         return menu;
+    }
+
+
+
+    /* WORLD EDIT UTILS */
+    public static void pasteArea(String schematicFile, Location pasteLocation) {
+        System.out.println("Pasting "+schematicFile+" at "+pasteLocation);
+        assert (pasteLocation.getWorld() != null);
+        // paste #schematic at #location
+        File file = new File(schematicFile);
+        if (!file.exists()) { return; }
+        BukkitWorld world = new BukkitWorld(pasteLocation.getWorld());
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
+        assert (format != null);
+        Clipboard clipboard = null;
+        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+            clipboard = reader.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (clipboard == null) { return; }
+        try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1)) {
+            ClipboardHolder holder = new ClipboardHolder(clipboard);
+            Operation operation = holder.createPaste(editSession)
+                                        .to(BlockVector3.at(pasteLocation.getBlockX(), pasteLocation.getBlockY(), pasteLocation.getBlockZ()))
+                                        .ignoreAirBlocks(false)
+                                        .copyBiomes(false)
+                                        .copyEntities(false)
+                                        .build();
+            Operations.complete(operation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Pasted "+schematicFile+" at "+pasteLocation); // OUTPUT pasted area
     }
 }

@@ -14,6 +14,6 @@ public class Area {
     }
 
     public String getSchematic() {
-        return type.isLevel() ? type.getSchemName()+"_"+level : type.getSchemName();
+        return type.isLevel() ? type.getSchemName()+"_"+(level-1) : type.getSchemName();
     }
 }
