@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REFACTOR refactor the menu mess.
+ */
 public class AreaAPI {
     @Getter DarkNpc main;
     @Getter HashMap<NPC, OfflinePlayer> npcs = new HashMap<>();
@@ -64,7 +67,7 @@ public class AreaAPI {
     public DarkMenu getUnlockNPCMenu(DarkMenu mainMenu, PlayerArea area) {
         DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Unlock NPCs");
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, mainMenu), 0);
-        menu.addItem(getUnlockItem(menu ,NPCType.FARMER, area), 2);
+        menu.addItem(getUnlockItem(menu, NPCType.FARMER, area), 2);
         menu.addItem(getUnlockItem(menu, NPCType.SMITH, area), 3);
         menu.addItem(getUnlockItem(menu, NPCType.HEALER, area), 4);
         menu.addItem(getUnlockItem(menu, NPCType.ALCHEMIST, area), 5);
@@ -78,15 +81,19 @@ public class AreaAPI {
     public MenuItem getUnlockItem(DarkMenu menu, NPCType t, PlayerArea area) {
         if (area.getArea(t).getLevel() > 0) {
             return new BasicItem(t.getMenuMaterial(), "&7" + t.getTitle(), "&8Already Unlocked", null);
-        } else {
-            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUnlockMenu(menu, t));
+        }
+        else {
+            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUnlockMenu(menu, area, t));
         }
     }
 
-    public DarkMenu getUnlockMenu(DarkMenu unlockNPCMenu, NPCType t) {
-        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Unlock "+t.getTitle()+" NPC?");
+    public DarkMenu getUnlockMenu(DarkMenu unlockNPCMenu, PlayerArea area, NPCType t) {
+        DarkMenu menu = new DarkMenu(ChatColor.GREEN + "Unlock " + t.getTitle() + " NPC?");
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, unlockNPCMenu), 0);
-        menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, null), 5);
+        menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, () -> {
+            area.unlockNPC(t);
+            getUnlockNPCMenu(getManagerMenu(area), area).show(unlockNPCMenu.getPlayer());
+        }), 5);
         menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 3);
         return menu;
     }
@@ -107,29 +114,33 @@ public class AreaAPI {
         return menu;
     }
 
-    public MenuItem getUpgradeItem(DarkMenu upgradeMenu, NPCType t, PlayerArea area ) {
+    public MenuItem getUpgradeItem(DarkMenu upgradeMenu, NPCType t, PlayerArea area) {
         int currentLevel = area.getArea(t).getLevel();
         if (currentLevel <= 0) {
             return new BasicItem(t.getMenuMaterial(), "&c" + t.getTitle(), "&4You need to unlock &4this NPC first!", null);
-        } else {
-            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUpgradeMenu(upgradeMenu, t, currentLevel));
+        }
+        else {
+            return new MenuNavItem(t.getMenuMaterial(), "&a" + t.getTitle(), null, getUpgradeMenu(upgradeMenu, area, t, currentLevel));
         }
     }
 
-    public DarkMenu getUpgradeMenu(DarkMenu upgradeMenu, NPCType t, int currentLevel) {
-        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Upgrade "+t.getTitle()+" to level "+(currentLevel+1)+"?");
-        menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, null), 6);
-        menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 2);
-        menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Cost", "&7"+(currentLevel*1000)+" silver", null), 4);
+    public DarkMenu getUpgradeMenu(DarkMenu upgradeMenu, PlayerArea area, NPCType t, int currentLevel) {
+        DarkMenu menu = new DarkMenu(ChatColor.GREEN + "Upgrade to level " + (currentLevel + 1) + "?");
+        menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, () -> {
+            boolean upgrade = (area.upgrade(t)); // shouldn't be able to upgrade an npc unless they've been unlocked.
+            assert(upgrade);
+            getUpgradeNPCMenu(getManagerMenu(area), area).show(upgradeMenu.getPlayer());
+        }), 5);
+        menu.addItem(new BasicItem(t.getMenuMaterial(), t.getTitle(), "&7Cost: " + (currentLevel * 1000) + " silver", null), 3);
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, upgradeMenu), 0);
         return menu;
     }
 
     /* MANAGE AREA MENU */
     public DarkMenu getManageAreasMenu(DarkMenu mainMenu, PlayerArea area) {
-        DarkMenu menu = new DarkMenu(ChatColor.DARK_PURPLE+"Manage Areas");
+        DarkMenu menu = new DarkMenu(ChatColor.DARK_PURPLE + "Manage Areas");
         for (int i = 0; i < 7; i++) {
-            menu.addItem(getAreaItem(menu, i, area), i+2);
+            menu.addItem(getAreaItem(menu, i, area), i + 2);
         }
         menu.addItem(new BasicItem(Material.BLACK_STAINED_GLASS_PANE, "", null, null), 1);
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, mainMenu), 0);
@@ -137,10 +148,11 @@ public class AreaAPI {
     }
 
     public MenuItem getAreaItem(DarkMenu previousMenu, int id, PlayerArea area) {
-        if (area.getUnlockedAreas() < id) return new BasicItem(Material.RED_STAINED_GLASS_PANE, "Area "+(id+1), "&4You need to unlock &4this area first!", null);
+        if (area.getUnlockedAreas() < id) { return new BasicItem(Material.RED_STAINED_GLASS_PANE, "Area " + (id + 1), "&4You need to unlock &4this area first!", null); }
         if (area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
-            return new MenuNavItem(Material.GRAY_STAINED_GLASS_PANE, "Area "+(id+1), "&8This area is empty!", getManageAreaMenu(previousMenu, null, area));
-        } else {
+            return new MenuNavItem(Material.GRAY_STAINED_GLASS_PANE, "Area " + (id + 1), "&8This area is empty!", getManageAreaMenu(previousMenu, null, area));
+        }
+        else {
             NPCType type = area.getCurrentAreas().get(id);
             return new MenuNavItem(type.getMenuMaterial(), type.getTitle(), null, getManageAreaMenu(previousMenu, area.getArea(type), area));
         }
@@ -154,7 +166,8 @@ public class AreaAPI {
             menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 2);
             menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", "&4There is no NPC at &4this area!", null), 4);
             menu.addItem(new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, getAddNPCMenu(menu, playerArea)), 6);
-        } else {
+        }
+        else {
             menu = new DarkMenu("Manage " + area.getType().getTitle() + " Area");
             if (area.getType() != null) {
                 menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", null, null), 2);
@@ -173,19 +186,19 @@ public class AreaAPI {
 
     /* ADD NPC MENU */
     public DarkMenu getAddNPCMenu(DarkMenu managerAreasMenu, PlayerArea playerArea) {
-        DarkMenu menu = new DarkMenu(ChatColor.GREEN+"Add NPC to Area");
+        DarkMenu menu = new DarkMenu(ChatColor.GREEN + "Add NPC to Area");
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, managerAreasMenu), 0);
         List<NPCType> list = playerArea.getAvailableNPCS();
         int pos = 1;
         for (NPCType type : list) {
-            menu.addItem(new BasicItem(type.getMenuMaterial(), "&a"+type.getTitle(), null, null), pos++);
+            menu.addItem(new BasicItem(type.getMenuMaterial(), "&a" + type.getTitle(), "&7Level &d"+playerArea.getArea(type).getLevel(), null), pos++);
         }
         return menu;
     }
 
     /* NPC MANAGER MENU */
     public DarkMenu getManagerMenu(PlayerArea playerArea) {
-        DarkMenu menu = new DarkMenu(ChatColor.RED+"Manage NPCs");
+        DarkMenu menu = new DarkMenu(ChatColor.RED + "Manage NPCs");
         menu.addItem(new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu(menu, playerArea)), 2);
         menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu(menu, playerArea)), 4);
         menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu(menu, playerArea)), 6);

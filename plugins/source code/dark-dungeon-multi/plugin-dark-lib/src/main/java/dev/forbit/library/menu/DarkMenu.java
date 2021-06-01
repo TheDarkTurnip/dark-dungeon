@@ -19,6 +19,7 @@ import java.util.HashMap;
 public class DarkMenu implements Listener {
     @Getter HashMap<Integer, MenuItem> items = new HashMap<>();
     @Getter @Setter String title;
+    @Getter @Setter Player player;
 
     public DarkMenu(String title) {
         setTitle(title);
@@ -50,6 +51,7 @@ public class DarkMenu implements Listener {
     }
 
     public void show(Player player) {
+        setPlayer(player);
         player.openInventory(this.getInventory());
         Bukkit.getPluginManager().registerEvents(this, DarkLib.getInstance());
     }
@@ -79,9 +81,4 @@ public class DarkMenu implements Listener {
         HandlerList.unregisterAll(this);
 
     }
-
-
-
-
-
 }

@@ -70,4 +70,23 @@ public class PlayerArea {
         }
         return list;
     }
+
+    /**
+     * Unlocks an npc
+     * @param t
+     */
+    public void unlockNPC(NPCType t) {
+        getArea(t).setLevel(1);
+    }
+
+    /**
+     * Upgrades an NPC's level
+     * @param t
+     */
+    public boolean upgrade(NPCType t) {
+        if (getArea(t) == null || getArea(t).getLevel() <= 0) return false;
+        getArea(t).setLevel(getArea(t).getLevel()+1);
+        System.out.println("upgraded npc: "+t.name());
+        return true;
+    }
 }
