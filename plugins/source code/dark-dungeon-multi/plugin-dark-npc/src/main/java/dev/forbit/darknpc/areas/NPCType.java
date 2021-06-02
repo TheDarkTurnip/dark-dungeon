@@ -4,13 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 
-/**
- * TODO add max levels
- */
 public enum NPCType {
     FARMER("farmhouse", 4, Material.WHEAT, "Farmer"),
     SMITH("smith", 4, Material.ANVIL, "Item Smith"),
-    HEALER("", 4, Material.APPLE, "Healer"),
+    HEALER("healer", 4, Material.APPLE, "Healer"),
     ALCHEMIST("", 4, Material.POTION, "Alchemist"),
     GUILD_REP("", 3, Material.EMERALD, "Guild Representative"),
     INFUSER("", Material.NETHERITE_INGOT, "Infuser"),
