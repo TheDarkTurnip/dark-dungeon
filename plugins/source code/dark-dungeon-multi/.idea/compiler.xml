@@ -8,12 +8,12 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.20/18bcea7d5df4d49227b4a0743a536208ce4825bb/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="dark-npc.main" />
-        <module name="dark-npc.plugin-dark-spawners.main" />
-        <module name="dark-npc.plugin-dark-items.main" />
-        <module name="dark-npc.plugin-dark-world.main" />
-        <module name="dark-npc.plugin-dark-generator.main" />
-        <module name="dark-npc.plugin-dark-lib.main" />
+        <module name="dark-portal.plugin-dark-spawners.main" />
+        <module name="dark-portal.plugin-dark-world.main" />
+        <module name="dark-portal.plugin-dark-lib.main" />
+        <module name="dark-portal.main" />
+        <module name="dark-portal.plugin-dark-items.main" />
+        <module name="dark-portal.plugin-dark-generator.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">
@@ -38,27 +38,6 @@
       <module name="dark-dungeon-mutli.plugin-dark-world" target="1.8" />
       <module name="dark-dungeon-mutli.plugin-dark-world.main" target="1.8" />
       <module name="dark-dungeon-mutli.plugin-dark-world.test" target="1.8" />
-      <module name="dark-lib" target="1.8" />
-      <module name="dark-lib.main" target="1.8" />
-      <module name="dark-lib.test" target="1.8" />
-      <module name="dark-portal" target="1.8" />
-      <module name="dark-portal.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-generator" target="1.8" />
-      <module name="dark-portal.plugin-dark-generator.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-generator.test" target="1.8" />
-      <module name="dark-portal.plugin-dark-items" target="1.8" />
-      <module name="dark-portal.plugin-dark-items.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-items.test" target="1.8" />
-      <module name="dark-portal.plugin-dark-lib" target="1.8" />
-      <module name="dark-portal.plugin-dark-lib.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-lib.test" target="1.8" />
-      <module name="dark-portal.plugin-dark-spawners" target="1.8" />
-      <module name="dark-portal.plugin-dark-spawners.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-spawners.test" target="1.8" />
-      <module name="dark-portal.plugin-dark-world" target="1.8" />
-      <module name="dark-portal.plugin-dark-world.main" target="1.8" />
-      <module name="dark-portal.plugin-dark-world.test" target="1.8" />
-      <module name="dark-portal.test" target="1.8" />
       <module name="DarkItems" target="1.8" />
       <module name="DarkItems.main" target="1.8" />
       <module name="DarkItems.plugin-dark-lib" target="1.8" />

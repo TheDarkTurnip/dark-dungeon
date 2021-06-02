@@ -8,24 +8,33 @@ import org.bukkit.Material;
  * TODO add max levels
  */
 public enum NPCType {
-    FARMER("farmhouse", true, Material.WHEAT, "Farmer"),
-    SMITH("", true, Material.ANVIL, "Item Smith"),
-    HEALER("", true, Material.APPLE, "Healer"),
-    ALCHEMIST("", true, Material.POTION, "Alchemist"),
-    GUILD_REP("", true, Material.EMERALD, "Guild Representative"),
-    INFUSER("", true, Material.NETHERITE_INGOT, "Infuser"),
-    ADV_ITEM_SMITH("", false, Material.SMITHING_TABLE, "Advanced Item Smith"),
-    ENCHANTER("", false, Material.ENCHANTING_TABLE, "Enchanter");
+    FARMER("farmhouse", 4, Material.WHEAT, "Farmer"),
+    SMITH("smith", 4, Material.ANVIL, "Item Smith"),
+    HEALER("", 4, Material.APPLE, "Healer"),
+    ALCHEMIST("", 4, Material.POTION, "Alchemist"),
+    GUILD_REP("", 3, Material.EMERALD, "Guild Representative"),
+    INFUSER("", Material.NETHERITE_INGOT, "Infuser"),
+    ADV_ITEM_SMITH("", Material.SMITHING_TABLE, "Advanced Item Smith"),
+    ENCHANTER("", Material.ENCHANTING_TABLE, "Enchanter");
 
     @Getter @Setter String schemName;
-    @Getter @Setter boolean level;
+    @Getter @Setter int maxLevel;
     @Getter @Setter Material menuMaterial;
     @Getter @Setter String title;
 
-    NPCType(String schem, boolean level, Material menuMaterial, String title) {
+    NPCType(String schem, Material menuMaterial, String title) {
         setSchemName(schem);
-        setLevel(level);
+        setMaxLevel(0);
         setMenuMaterial(menuMaterial);
         setTitle(title);
     }
+
+    NPCType(String schem, int maxLevel, Material menuMaterial, String title) {
+        setSchemName(schem);
+        setMaxLevel(maxLevel);
+        setMenuMaterial(menuMaterial);
+        setTitle(title);
+    }
+
+    public boolean isLevel() { return maxLevel > 0; }
 }
