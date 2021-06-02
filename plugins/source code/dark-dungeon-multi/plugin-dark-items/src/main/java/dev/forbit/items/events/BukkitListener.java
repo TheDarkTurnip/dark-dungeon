@@ -13,6 +13,7 @@ import dev.forbit.library.Utils;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -29,6 +30,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class BukkitListener implements Listener {
@@ -76,7 +78,7 @@ public class BukkitListener implements Listener {
         main.getLogger().info("called event: " + event.getClass().getName());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) { return; }
-        main.getLogger().info("event data: "+gson.toJson(event));
+        main.getLogger().info("event data: " + gson.toJson(event));
         event.getDamaged().damage(event.getDamage());
 
         if (event.getDamager() instanceof DarkPlayer) {
@@ -198,50 +200,88 @@ public class BukkitListener implements Listener {
         arrow.setPersistent(false);
     }
 
-    @EventHandler public void onArrowHit(ProjectileHitEvent event) {
+    @EventHandler public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getHitEntity() == null || !(event.getHitEntity() instanceof LivingEntity)) { return; }
-        if (!(event.getEntity() instanceof Arrow)) { return; }
-        Arrow arrow = (Arrow) event.getEntity();
-        DarkEntity entity = arrow.getShooter() instanceof Player ? new DarkPlayer((Player) arrow.getShooter()) : new DarkEntity((LivingEntity) arrow.getShooter());
-        DarkWeapon weapon = (DarkWeapon) Objects.requireNonNull(arrow.getMetadata("dark-item").get(0).value());
+        if (!(event.getEntity() instanceof Arrow || event.getEntity() instanceof Snowball)) { return; }
+        Projectile projectile =  event.getEntity();
+        DarkEntity entity = projectile.getShooter() instanceof Player ? new DarkPlayer((Player) projectile.getShooter()) : new DarkEntity((LivingEntity) projectile.getShooter());
+        DarkWeapon weapon = (DarkWeapon) Objects.requireNonNull(projectile.getMetadata("dark-item").get(0).value());
         ItemStack item = DarkItems.getApi().infuseItem(weapon);
-        DarkDamageEvent darkEvent = new DarkEntityDamageEntityEvent(entity, new DarkEntity((LivingEntity) event.getHitEntity()),item, DarkDamageAction.RANGED, Utils.getBlankDamageMap());
-        if (arrow.isCritical()) {
+        DarkDamageEvent darkEvent = new DarkEntityDamageEntityEvent(entity, new DarkEntity((LivingEntity) event.getHitEntity()), item, DarkDamageAction.RANGED, Utils.getBlankDamageMap());
+        if (projectile instanceof Arrow && ((Arrow) projectile).isCritical()) {
             darkEvent.getChangePercent().put(weapon.getDamageType(), 1.5f);
         }
         callEvent(darkEvent);
-        arrow.remove();
+        projectile.remove();
+    }
+
+
+    void shoot(Player player, DarkItem darkItem) {
+        Weapon weapon = (Weapon) darkItem;
+        WeaponType type = weapon.getWeapon();
+
+        HashMap<DamageType, Double> damageMap = Utils.getBlankDamageMap();
+        DamageType damageType = weapon.getDamageType();
+
+        switch (type) {
+            case STAFF:
+                if (damageType.equals(DamageType.NORMAL)) { damageType = DamageType.MAGIC; }
+                damageMap.put(damageType, weapon.getDamage());
+                double range = 15.0;
+                if (darkItem instanceof Enchantable) {
+                    Enchantable enchantable = (Enchantable) darkItem;
+                    range += enchantable.getEnchantment(Enchantment.RANGE) * 2.0;
+                }
+                DarkItems.projectileManager.addProjectile(player, range, 1.0, damageMap);
+                Utils.playSound(player, Sound.ENTITY_ENDER_EYE_DEATH, 1.5f);
+                break;
+            case SLING:
+                Snowball snowball = player.getWorld().spawn(player.getEyeLocation(), Snowball.class);
+                snowball.setShooter(player);
+                snowball.setVelocity(player.getEyeLocation().getDirection().multiply(1.1d));
+                snowball.setMetadata("slot", new FixedMetadataValue(main, player.getInventory().getHeldItemSlot()));
+                snowball.setMetadata("dark-item", new FixedMetadataValue(main, weapon));
+                Utils.playSound(player, Sound.ENTITY_SNOWBALL_THROW, 1.2f);
+                break;
+            case DART_SHOOTER:
+                Arrow arrow = player.getWorld().spawn(player.getEyeLocation(), Arrow.class);
+                arrow.setShooter(player);
+                arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+                arrow.setVelocity(player.getEyeLocation().getDirection().multiply(3.0d));
+                arrow.setMetadata("slot", new FixedMetadataValue(main, player.getInventory().getHeldItemSlot()));
+                arrow.setMetadata("dark-item", new FixedMetadataValue(main, weapon));
+                Utils.playSound(player, Sound.ENTITY_ARROW_SHOOT, 1.5f);
+                break;
+        }
     }
 
     // magic staff go shoot shoot
-    @EventHandler public void magicStaff(PlayerInteractEvent event) {
+    // dart shooter go pew pew
+    // sling go plop plop
+    @EventHandler public void onCustomWeaponUse(PlayerInteractEvent event) {
         if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) { return; }
         if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             DarkItem darkItem = DarkItems.getApi().loadItem(event.getItem());
             if (darkItem == null) { return; }
             if (darkItem instanceof Weapon) {
                 Weapon weapon = (Weapon) darkItem;
-                if (weapon.getWeapon().equals(WeaponType.STAFF)) {
-                    // magic
-                    event.setCancelled(true);
-
-                    if (onCooldown(event.getPlayer(), WeaponType.STAFF)) { return; }
-                    double range = 15.0;
-                    if (darkItem instanceof Enchantable) {
-                        Enchantable enchantable = (Enchantable) darkItem;
-                        range += enchantable.getEnchantment(Enchantment.RANGE) * 2.0;
+                List<WeaponType> usableWeapons = new ArrayList<WeaponType>() {
+                    {
+                        add(WeaponType.SLING);
+                        add(WeaponType.STAFF);
+                        add(WeaponType.DART_SHOOTER);
                     }
-                    HashMap<DamageType, Double> damageMap = Utils.getBlankDamageMap();
-                    DamageType damageType = weapon.getDamageType();
-                    if (damageType.equals(DamageType.NORMAL)) { damageType = DamageType.MAGIC; }
-                    damageMap.put(damageType, weapon.getDamage());
-                    DarkItems.projectileManager.addProjectile(event.getPlayer(), range, 1.0, damageMap);
+                };
+                if (usableWeapons.contains(weapon.getWeapon())) {
+                    event.setCancelled(true);
+                    if (onCooldown(event.getPlayer(), weapon.getWeapon())) { return; }
+                    shoot(event.getPlayer(), weapon);
                     if (darkItem instanceof Repairable) {
                         Repairable repairable = (Repairable) darkItem;
                         repairable.addUse(1);
                     }
                     event.getPlayer().getInventory().setItemInMainHand(DarkItems.getApi().infuseItem(darkItem));
-                    cooldown(event.getPlayer(), WeaponType.STAFF);
+                    cooldown(event.getPlayer(), weapon.getWeapon());
                 }
             }
         }

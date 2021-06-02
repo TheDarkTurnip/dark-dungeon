@@ -8,10 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Utils {
     public static final double leaniency = 1.0;
@@ -225,4 +222,20 @@ public class Utils {
         }
         return players;
     }
+    public static void playSound(Player player, Sound sound, float pitch) {
+        Random rand = new Random();
+        switch (rand.nextInt(2)) {
+            case 1:
+                player.playSound(player.getLocation(), sound, 1f, pitch - 0.1f);
+                break;
+            case 2:
+                player.playSound(player.getLocation(), sound, 1f, pitch + 0.1f);
+                break;
+            default:
+                player.playSound(player.getLocation(), sound, 1f, pitch);
+                break;
+
+        }
+    }
+
 }
