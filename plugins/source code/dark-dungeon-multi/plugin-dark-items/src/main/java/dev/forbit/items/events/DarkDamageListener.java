@@ -1,5 +1,6 @@
 package dev.forbit.items.events;
 
+import com.google.gson.Gson;
 import dev.forbit.effects.MobEffects;
 import dev.forbit.items.DarkItems;
 import dev.forbit.items.Holograms;
@@ -184,6 +185,17 @@ public class DarkDamageListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR) public void hologramEvent(DarkDamageEvent event) {
         Holograms.damageHologram(event.getDamaged().getEntity(), event.getDamageMap());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH) public void changePercent(DarkDamageEvent event) {
+        HashMap<DamageType, Double> newMap = Utils.getBlankDamageMap();
+        for (DamageType type : event.getDamageMap().keySet()) {
+            double damage = event.getDamageMap().get(type);
+            double changedDamage = damage * (event.getChangePercent().get(type) <= 0 ? 1 : event.getChangePercent().get(type));
+            newMap.put(type, changedDamage);
+        }
+        event.setDamageMap(newMap);
+        main.getLogger().info(newMap.toString());
     }
 
 }

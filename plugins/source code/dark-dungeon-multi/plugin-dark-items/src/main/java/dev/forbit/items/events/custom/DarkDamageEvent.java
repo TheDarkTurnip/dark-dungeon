@@ -47,7 +47,7 @@ public abstract class DarkDamageEvent extends Event {
     public double getDamage() {
         double damage = 0.0;
         for (DamageType type : DamageType.values()) {
-            damage += getDamageMap().get(type) * (1+getChangePercent().get(type));
+            damage += getDamageMap().get(type);
         }
         return damage;
     }

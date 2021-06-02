@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.forbit.items.DarkItems;
 import dev.forbit.items.events.custom.*;
 import dev.forbit.items.items.DarkItem;
+import dev.forbit.items.items.DarkWeapon;
 import dev.forbit.items.items.types.*;
 import dev.forbit.library.DamageType;
 import dev.forbit.library.Symbols;
@@ -13,23 +14,28 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.*;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class BukkitListener implements Listener {
     static DarkItems main;
+    @Getter private final HashMap<Player, Integer> cooldown = new HashMap<>();
+    private final HashMap<Player, Integer> notifyCooldown = new HashMap<>();
+    private final HashMap<WeaponType, Player> weaponCooldown = new HashMap<>();
 
     public BukkitListener(DarkItems m) {
         main = m;
@@ -41,7 +47,8 @@ public class BukkitListener implements Listener {
             for (Player p : cooldown.keySet()) {
                 if (cooldown.get(p) <= 1) {
                     remove.add(p);
-                } else {
+                }
+                else {
                     cooldown.put(p, cooldown.get(p) - 1);
                 }
             }
@@ -53,7 +60,8 @@ public class BukkitListener implements Listener {
             for (Player p : notifyCooldown.keySet()) {
                 if (notifyCooldown.get(p) <= 1) {
                     remove.add(p);
-                } else {
+                }
+                else {
                     notifyCooldown.put(p, notifyCooldown.get(p) - 1);
                 }
             }
@@ -63,52 +71,12 @@ public class BukkitListener implements Listener {
         }, 0L, 1L);
     }
 
-    @Getter private final HashMap<Player, Integer> cooldown = new HashMap<>();
-    private final HashMap<Player, Integer> notifyCooldown = new HashMap<>();
-    private final HashMap<WeaponType, Player> weaponCooldown = new HashMap<>();
-
-    private boolean onCooldown(Player player, WeaponType type) {
-        for (WeaponType w : weaponCooldown.keySet()) {
-            if (w.equals(type)) { return true; }
-        }
-        return false;
-    }
-
-    private void addCooldown(Player player, WeaponType type) {
-        weaponCooldown.put(type, player);
-    }
-
-    private void removePlayer(Player player, WeaponType type) {
-        weaponCooldown.remove(type, player);
-        // DarkItems.plugin.getLogger().info("weapon cooldown size:" +
-        // weaponCooldown.size());
-    }
-
-    private void cooldown(Player player, WeaponType weapon) {
-        addCooldown(player, weapon);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> removePlayer(player, weapon), 10L);
-    }
-
-    // IDEA could be used for longer range weapons (like scythes)
-    /*@EventHandler public void onPvE(PlayerInteractEvent event) {
-        if (event.getHand().equals(EquipmentSlot.OFF_HAND)) { return; }
-        if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-            // attack
-
-            LivingEntity closestEntity = Utils.getNearestLivingEntity(event.getPlayer(), event.getPlayer().getEyeLocation().getDirection(), 3.5);
-            if (closestEntity == null || closestEntity.isDead()) { return; }
-            Player player = event.getPlayer();
-            ItemStack item = player.getInventory().getItemInMainHand();
-            callEvent(new DarkPlayerDamageEntityEvent(new DarkPlayer(player), new DarkEntity(closestEntity), item, DarkDamageAction.MELEE, Utils.getBlankDamageMap()));
-
-        }
-    }*/
-
     public static void callEvent(DarkDamageEvent event) {
         Gson gson = new GsonBuilder().serializeNulls().create();
         main.getLogger().info("called event: " + event.getClass().getName());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) { return; }
+        main.getLogger().info("event data: "+gson.toJson(event));
         event.getDamaged().damage(event.getDamage());
 
         if (event.getDamager() instanceof DarkPlayer) {
@@ -135,13 +103,50 @@ public class BukkitListener implements Listener {
 
     }
 
+    private boolean onCooldown(Player player, WeaponType type) {
+        for (WeaponType w : weaponCooldown.keySet()) {
+            if (w.equals(type)) { return true; }
+        }
+        return false;
+    }
+
+    private void addCooldown(Player player, WeaponType type) {
+        weaponCooldown.put(type, player);
+    }
+
+    private void removePlayer(Player player, WeaponType type) {
+        weaponCooldown.remove(type, player);
+        // DarkItems.plugin.getLogger().info("weapon cooldown size:" +
+        // weaponCooldown.size());
+    }
+
+    // IDEA could be used for longer range weapons (like scythes)
+    /*@EventHandler public void onPvE(PlayerInteractEvent event) {
+        if (event.getHand().equals(EquipmentSlot.OFF_HAND)) { return; }
+        if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+            // attack
+
+            LivingEntity closestEntity = Utils.getNearestLivingEntity(event.getPlayer(), event.getPlayer().getEyeLocation().getDirection(), 3.5);
+            if (closestEntity == null || closestEntity.isDead()) { return; }
+            Player player = event.getPlayer();
+            ItemStack item = player.getInventory().getItemInMainHand();
+            callEvent(new DarkPlayerDamageEntityEvent(new DarkPlayer(player), new DarkEntity(closestEntity), item, DarkDamageAction.MELEE, Utils.getBlankDamageMap()));
+
+        }
+    }*/
+
+    private void cooldown(Player player, WeaponType weapon) {
+        addCooldown(player, weapon);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> removePlayer(player, weapon), 10L);
+    }
+
     @EventHandler public void onHit(EntityDamageByEntityEvent event) {
         event.setCancelled(true);
         Entity damager = event.getDamager();
         Entity damaged = event.getEntity();
         ItemStack item = null;
-        System.out.println("portal cooldown: "+damager.getPortalCooldown());
-        if (damager.getPortalCooldown() > 1) return;
+        System.out.println("portal cooldown: " + damager.getPortalCooldown());
+        if (damager.getPortalCooldown() > 1) { return; }
         if (damager instanceof LivingEntity) {
             EntityEquipment ee = ((LivingEntity) damager).getEquipment();
             assert ee != null;
@@ -172,9 +177,45 @@ public class BukkitListener implements Listener {
         damager.setPortalCooldown(10);
     }
 
+    @EventHandler public void onBowShoot(ProjectileLaunchEvent event) {
+        if (!(event.getEntity().getShooter() instanceof LivingEntity)) { return; }
+        if (!(event.getEntityType().equals(EntityType.ARROW))) { return; }
+        LivingEntity shooter = (LivingEntity) event.getEntity().getShooter();
+        if (shooter.getEquipment() == null) {
+            return; // should never be null if launching an arrow
+        }
+        DarkItem bow = DarkItems.getApi().loadItem(shooter.getEquipment().getItemInMainHand());
+        int slot = -1;
+        if (shooter instanceof Player) {
+            Player player = (Player) shooter;
+            slot = player.getInventory().getHeldItemSlot();
+        }
+        assert (event.getEntity() instanceof Arrow); // should never be not arrow since we checked entityType earlier.
+        Arrow arrow = (Arrow) event.getEntity();
+        arrow.setDamage(0.0);
+        arrow.setMetadata("slot", new FixedMetadataValue(main, slot));
+        arrow.setMetadata("dark-item", new FixedMetadataValue(main, bow));
+        arrow.setPersistent(false);
+    }
+
+    @EventHandler public void onArrowHit(ProjectileHitEvent event) {
+        if (event.getHitEntity() == null || !(event.getHitEntity() instanceof LivingEntity)) { return; }
+        if (!(event.getEntity() instanceof Arrow)) { return; }
+        Arrow arrow = (Arrow) event.getEntity();
+        DarkEntity entity = arrow.getShooter() instanceof Player ? new DarkPlayer((Player) arrow.getShooter()) : new DarkEntity((LivingEntity) arrow.getShooter());
+        DarkWeapon weapon = (DarkWeapon) Objects.requireNonNull(arrow.getMetadata("dark-item").get(0).value());
+        ItemStack item = DarkItems.getApi().infuseItem(weapon);
+        DarkDamageEvent darkEvent = new DarkEntityDamageEntityEvent(entity, new DarkEntity((LivingEntity) event.getHitEntity()),item, DarkDamageAction.RANGED, Utils.getBlankDamageMap());
+        if (arrow.isCritical()) {
+            darkEvent.getChangePercent().put(weapon.getDamageType(), 1.5f);
+        }
+        callEvent(darkEvent);
+        arrow.remove();
+    }
+
     // magic staff go shoot shoot
     @EventHandler public void magicStaff(PlayerInteractEvent event) {
-        if (event.getHand().equals(EquipmentSlot.OFF_HAND)) { return; }
+        if (event.getHand() == null || event.getHand().equals(EquipmentSlot.OFF_HAND)) { return; }
         if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             DarkItem darkItem = DarkItems.getApi().loadItem(event.getItem());
             if (darkItem == null) { return; }
@@ -188,7 +229,7 @@ public class BukkitListener implements Listener {
                     double range = 15.0;
                     if (darkItem instanceof Enchantable) {
                         Enchantable enchantable = (Enchantable) darkItem;
-                        range += enchantable.getEnchantment(Enchantment.RANGE)*2.0;
+                        range += enchantable.getEnchantment(Enchantment.RANGE) * 2.0;
                     }
                     HashMap<DamageType, Double> damageMap = Utils.getBlankDamageMap();
                     DamageType damageType = weapon.getDamageType();
@@ -209,7 +250,7 @@ public class BukkitListener implements Listener {
     @EventHandler public void onInventoryClose(InventoryCloseEvent event) {
         Inventory inv = event.getView().getBottomInventory();
         InventoryHolder holder = inv.getHolder();
-        if (!(holder instanceof Player)) return;
+        if (!(holder instanceof Player)) { return; }
         Player player = (Player) holder;
         main.updateInventory(player);
         player.updateInventory();
