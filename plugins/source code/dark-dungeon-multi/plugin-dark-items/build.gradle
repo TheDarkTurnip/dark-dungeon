@@ -9,7 +9,7 @@ ext {
     lombokVersion = '1.18.20'
 }
 group = 'dev.forbit'
-version = '4.3.5-SNAPSHOT'
+version = '4.3.6-SNAPSHOT'
 jar.archiveBaseName='dark-items'
 
 sourceCompatibility = '1.8'

@@ -14,6 +14,8 @@ import dev.forbit.library.DamageType;
 import dev.forbit.library.Utils;
 import dev.forbit.library.effects.EffectType;
 import dev.forbit.library.effects.MobEffect;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,7 +37,18 @@ public class DarkDamageListener implements Listener {
             Weapon weapon = (Weapon) event.getWeapon();
             event.getDamageMap().put(weapon.getDamageType(), weapon.getDamage());
             if (weapon.getWeapon().equals(WeaponType.CLUB)) {
+                // slow the mob
                 MobEffects.addEffect(event.getDamaged().getEntity(), new MobEffect(((DarkPlayer) event.getDamager()).getPlayer(), EffectType.SLOW, 5));
+            }
+            else if (weapon.getWeapon().equals(WeaponType.DAGGER)) {
+                // dagger calculations
+                // 1.5x damage if mob is facing away.
+                if (Utils.isBehind(event.getDamaged().getEntity(), event.getDamager().getEntity())) {
+                    event.getDamageMap().put(weapon.getDamageType(), weapon.getDamage() * 1.5d);
+                    // play crit effect
+                    Location loc = Utils.getMidpoint(event.getDamaged().getEntity().getLocation(), event.getDamaged().getEntity().getEyeLocation());
+                    DarkItems.effectManager.display(Particle.CRIT_MAGIC, loc, 0f, 0f, 0f, 0.4f, 20, 1f, null, null, (byte) 0, 24.0f, Utils.getNearbyPlayers(loc));
+                }
             }
         }
         else {
@@ -65,7 +78,7 @@ public class DarkDamageListener implements Listener {
             trueConversionAmount += TalismanMain.hasTalisman(p, Talisman.TRUE_DAMAGE_2) ? 0.1 : 0;
         }*/
         for (DamageType t : damageMap.keySet()) {
-            if (t.equals(DamageType.TRUE)) continue;
+            if (t.equals(DamageType.TRUE)) { continue; }
             double dmg = damageMap.get(t);
             double dmgAfterArmor = dmg;
             if (dmg > 0) {
@@ -75,9 +88,9 @@ public class DarkDamageListener implements Listener {
                     dmg -= amount;
                 }
                 if (event.getDamaged() instanceof Player) {
-                    dmgAfterArmor = Utils.calculateArmor(dmg,
-                            armor/* + TalismanMain.getAdditonalProtection((Player) event.getDamaged())*/, piercingValue);
-                } else {
+                    dmgAfterArmor = Utils.calculateArmor(dmg, armor/* + TalismanMain.getAdditonalProtection((Player) event.getDamaged())*/, piercingValue);
+                }
+                else {
                     dmgAfterArmor = Utils.calculateArmor(dmg, armor, piercingValue);
                 }
 

@@ -2,10 +2,7 @@ package dev.forbit.library;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
-import org.bukkit.EntityEffect;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,19 +71,18 @@ public class Utils {
      */
     public static boolean isBehind(LivingEntity origin, LivingEntity target) {
         Location lo = origin.getEyeLocation();
-        Location o;
-        if (target instanceof Player) { // En is the other entity
+        Location o = target.getEyeLocation();
+        /*if (target instanceof Player) { // En is the other entity
             o = ((Player) target).getEyeLocation();
         }
         else {
             o = target.getLocation();
-        }
+        }*/
         Vector c = lo.toVector().subtract(o.toVector()); // Get vector between
         // you and other
         Vector d = origin.getEyeLocation().getDirection(); // Get direction you
         // are looking at
         double delta = c.dot(d);
-
         return delta > 0;
     }
 
@@ -218,5 +214,15 @@ public class Utils {
         }
         list.add(builder.toString().trim());
         return list;
+    }
+
+    public static List<Player> getNearbyPlayers(Location location) {
+        List<Player> players = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.getLocation().distanceSquared(location) < 500) {
+                players.add(p);
+            }
+        }
+        return players;
     }
 }
