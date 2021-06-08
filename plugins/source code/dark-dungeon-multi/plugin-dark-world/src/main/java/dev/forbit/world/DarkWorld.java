@@ -2,7 +2,11 @@ package dev.forbit.world;
 
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
+
+import java.io.File;
 
 
 /**
@@ -12,8 +16,20 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Forbit
  */
 public class DarkWorld extends JavaPlugin {
-    @Override public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        if (worldName.equals("schem_world")) { return new FlatGen(Material.BLACK_CONCRETE, 100); }
+
+    public DarkWorld() {
+        super();
+    }
+
+    protected DarkWorld(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        if (worldName.equals("schem_world")) {
+            return new FlatGen(Material.BLACK_CONCRETE, 100);
+        }
         return new ChunkGen();
     }
 }

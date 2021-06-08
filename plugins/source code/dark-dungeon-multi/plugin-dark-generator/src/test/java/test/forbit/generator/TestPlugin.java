@@ -2,25 +2,31 @@ package test.forbit.generator;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
+import dev.forbit.generator.plugin.CommandManager;
 import dev.forbit.generator.plugin.Generator;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 public class TestPlugin {
     private static ServerMock server;
     private static Generator plugin;
 
 
-
     @BeforeAll
     static void setUp() {
         server = MockBukkit.mock();
-        plugin = (Generator) MockBukkit.load(Generator.class);
+        PluginDescriptionFile file = new PluginDescriptionFile(
+                "dark-generator",
+                "test-version",
+                "dev.forbit.generator.plugin.Generator"
+        );
+        plugin = MockBukkit.loadWith(Generator.class, file);
+
     }
 
     @AfterAll
@@ -38,16 +44,7 @@ public class TestPlugin {
     @Test
     void testCommands() {
         CommandSender sender = server.addPlayer();
-        Assertions.assertAll(() -> {
-            Assertions.assertTrue(server.dispatchCommand(sender, "gen 0"));
-        }, () -> {
-            Assertions.assertTrue(server.dispatchCommand(sender, "gen 2"));
-        }, () -> {
-            Assertions.assertTrue(server.dispatchCommand(sender, "gen clear"));
-        }, () -> {
-            Assertions.assertTrue(server.dispatchCommand(sender, "gen 0"));
-        }, () -> {
-            Assertions.assertTrue(server.dispatchCommand(sender, "gen tp"));
-        });
+        CommandManager manager = plugin.getCommandManager();
+        manager.onCommand(sender, null,"gen", new String[] { "2" });
     }
 }

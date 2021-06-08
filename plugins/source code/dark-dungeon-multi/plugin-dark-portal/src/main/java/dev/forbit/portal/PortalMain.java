@@ -2,20 +2,36 @@ package dev.forbit.portal;
 
 import dev.forbit.generator.plugin.Generator;
 import dev.forbit.generator.plugin.Position;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PortalMain extends JavaPlugin implements Listener {
+    @Getter
     List<Porter> portals = new ArrayList<>();
 
+
+
+    public PortalMain() {
+        super();
+    }
+
+    protected PortalMain(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
+
     @Override public void onEnable() {
+
         World world = Bukkit.getWorld("world");
         World playerWorld = Bukkit.getWorld(Generator.PLAYER_DUNGEON_WORLD_NAME);
 

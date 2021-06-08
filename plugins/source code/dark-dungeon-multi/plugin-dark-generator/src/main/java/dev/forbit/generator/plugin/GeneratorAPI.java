@@ -56,7 +56,7 @@ public class GeneratorAPI {
          * This uses FAWE, and lags the server.
          * REFACTOR Run Async */
         makeArea(cell);
-        getGen().getLogger().info("GENERATING NEW AREA FOR " + id); // OUTPUT GENERATING NEW AREA
+        // getGen().getLogger().info("GENERATING NEW AREA FOR " + id); // OUTPUT GENERATING NEW AREA
         return cell;
     }
 

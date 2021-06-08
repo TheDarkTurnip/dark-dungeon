@@ -16,8 +16,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +31,15 @@ public final class DarkNpc extends JavaPlugin implements Listener {
     @Getter @Setter private static AreaAPI API;
     @Getter @Setter private NPCLib library;
     @Getter private HashMap<UUID, PlayerArea> playerAreas = new HashMap<>();
+
+
+    public DarkNpc() {
+        super();
+    }
+
+    protected DarkNpc(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
 
     @Override public void onEnable() {
         setLibrary(new NPCLib(this));

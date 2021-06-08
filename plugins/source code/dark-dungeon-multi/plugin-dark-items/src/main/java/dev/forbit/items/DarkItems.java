@@ -25,7 +25,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
+
+import java.io.File;
 
 public final class DarkItems extends JavaPlugin implements CommandExecutor {
 
@@ -35,6 +39,14 @@ public final class DarkItems extends JavaPlugin implements CommandExecutor {
     public static Loot loot;
     @Getter private static DarkItemAPI api;
     @Getter private static Holograms holograms;
+
+    public DarkItems() {
+        super();
+    }
+
+    protected DarkItems(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
 
 
     @Override public void onEnable() {

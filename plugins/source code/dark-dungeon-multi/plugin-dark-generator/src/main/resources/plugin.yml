@@ -1,13 +1,13 @@
+main: dev.forbit.generator.plugin.Generator
 name: dark-generator
 version: @version@
-main: dev.forbit.generator.plugin.Generator
 api-version: 1.16
 authors: [ Forbit ]
 description: Generate's the Player's Area and Dungeon Levels.
 website: forbit.dev
-depend: [ dark-world, dark-spawners, EffectLib ]
+depend: [ dark-world, dark-spawners, EffectLib, FastAsyncWorldEdit ]
 
 commands:
   gen:
-    usage: /gen <clear|tp|(int) i>
+    usage: "/gen <clear|tp|(int) i>"
     description: "Dungeon generator commands"

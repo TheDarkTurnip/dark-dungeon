@@ -17,6 +17,7 @@ targetCompatibility = "1.9"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven {
         name = 'spigotmc-repo'
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
@@ -36,8 +37,11 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compile project(":plugin-dark-generator")
+    compile project(":plugin-dark-lib")
     compile("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
     compile("net.jitse:npclib-api:2.11.1-SNAPSHOT")
+    compile 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 }
 
 processResources {

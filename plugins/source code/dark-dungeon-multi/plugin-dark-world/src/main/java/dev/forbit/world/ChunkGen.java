@@ -18,13 +18,13 @@ public class ChunkGen extends ChunkGenerator {
     /**
      * World generator where every chunk that has x < -10 and y < -10 as stone, and everything else is air.
      */
-    @Override @NonNull public ChunkData generateChunkData(@NonNull World world, @NonNull Random random, int chunkX, int chunkZ, @NonNull BiomeGrid biome) {
+    @Override @NonNull public ChunkData generateChunkData(@NonNull World world, @NonNull Random random, int chunkX, int chunkZ, BiomeGrid biome) {
         ChunkData chunk = this.createChunkData(world);
         // set biome
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = 0; y < 255; y++) {
-                    biome.setBiome(x, y, z, Biome.FOREST);
+                    if (biome != null) biome.setBiome(x, y, z, Biome.FOREST);
                 }
                 chunk.setBlock(x, 0, z, Material.BEDROCK);
             }

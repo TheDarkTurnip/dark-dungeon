@@ -23,14 +23,10 @@ import dev.forbit.spawners.classes.MobGroupSpawner;
 import dev.forbit.world.ChunkGen;
 import dev.forbit.world.FlatGen;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,10 +40,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 
 import javax.annotation.Nullable;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Minecraft plugin for DarkDungeon Any
@@ -55,7 +48,7 @@ import java.util.UUID;
  *
  * @author <a href="https://forbit.dev">Forbit</a>
  */
-public class Generator extends JavaPlugin implements Listener, CommandExecutor {
+public class Generator extends JavaPlugin implements Listener {
     /* ----------------------------------------------------------------------- */
     /* |						GETTERS AND SETTERS 						 | */
     /* ----------------------------------------------------------------------- */
@@ -94,7 +87,14 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
      * block the server's main thread.
      */
     @Getter
-    GenThread generatorTasks = new GenThread(this);
+    GenThread generatorTasks;
+
+    /**
+     * Command Manager
+     */
+    @Getter
+    CommandManager commandManager;
+
     /**
      * Hosts a map of {@link PlayerDungeon}s, which store information regarding
      * dungeon generation.
@@ -128,6 +128,9 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
     /* ----------------------------------------------------------------------- */
 
     // These constructors are necessary for mocking testing
+    @Getter
+    @Setter
+    private boolean test = false;
 
     public Generator() {
         super();
@@ -162,15 +165,23 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
      */
     @Override
     public void onEnable() {
+        if (this.getDescription().getVersion().equals("test-version")) setTest(true);
         API = new GeneratorAPI(this);
         instance = this;
         setEffectManager(new EffectManager(this));
         makeDir();
         this.getServer().getPluginManager().registerEvents(this, this);
+        generatorTasks = new GenThread(this);
         generatorTasks.start();
-        makeWorld();
+
+        commandManager = new CommandManager(this);
+
+
+        if (!isTest()) Objects.requireNonNull(this.getCommand("gen")).setExecutor(commandManager);
+
+        if (!isTest()) makeWorld();
         try {
-            load();
+            if (!isTest()) load();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -179,53 +190,10 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
     @Override
     public void onDisable() {
         try {
-            save();
+            if (!isTest()) save();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String commandLabel, @NonNull String[] args) {
-        if (args.length < 1) {
-            sender.sendMessage(ChatColor.RED + "Requires an argument: /gen <clear|tp|n>");
-            return true;
-        }
-        Player p = (Player) sender;
-        switch (args[0].toLowerCase()) {
-            case "clear": {
-                // removes all generation.
-                getAPI().getWorldEditUtils().clearArea(getAPI().getCell(p.getUniqueId()));
-                getInstances().get(p.getUniqueId()).setFloors(new HashMap<>());
-                getInstances().get(p.getUniqueId()).invalidateCheckpoint();
-                DarkSpawners.getApi().clear(p);
-                return true;
-            }
-            case "tp": {
-                // teleports the player to the topcorner of their starting cell.
-                Tile t = getInstances().get(p.getUniqueId()).getFloors().get(0).getStart();
-                int grix = getAPI().getCell(p.getUniqueId()).getGridX();
-                int grip = getAPI().getCell(p.getUniqueId()).getGridY();
-                int x = t.getX() * 21 + (grix * 1000);
-                int z = t.getY() * 21 + (grip * 1000);
-                int y = 132;
-                Location loc = new Location(getPlayerWorld(), x, y, z);
-                p.teleport(loc);
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Teleport to &ddungeon"));
-                return true;
-            }
-            default: {
-                // example: /gen 1
-                // generates the level 1 and only level 1.
-                try {
-                    int i = Integer.parseInt(args[0]);
-                    scheduleGen(p.getUniqueId(), i);
-                } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Error parsing an argument: /gen <clear|tp|n>");
-                    return true;
-                }
-            }
-        }
-        return true;
     }
 
     @EventHandler

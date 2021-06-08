@@ -42,6 +42,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compile project(":plugin-dark-lib")
     compile project(":plugin-dark-items")
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 }
 processResources {
     from(sourceSets.main.resources.srcDirs) {

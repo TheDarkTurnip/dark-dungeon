@@ -23,6 +23,7 @@ repositories {
         name = 'spigotmc-repo'
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
+
     maven {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
@@ -32,19 +33,23 @@ repositories {
     maven {
         url = uri("https://mvn.intellectualsites.com/content/repositories/releases/")
     }
+
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     implementation 'org.jetbrains:annotations:20.1.0'
-    compile 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
-    compile("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
-    compile project(":plugin-dark-world")
-    compile project(":plugin-dark-spawners")
+    implementation 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    implementation ("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
+    implementation project(":plugin-dark-world")
+    implementation project(":plugin-dark-spawners")
     implementation 'com.elmakers.mine.bukkit:EffectLib:8.0'
-    compile 'org.junit.jupiter:junit-jupiter:5.7.2'
-    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.0.0'
+
+    // tests
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 
 }
 

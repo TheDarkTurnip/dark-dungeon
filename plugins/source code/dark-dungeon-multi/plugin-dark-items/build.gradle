@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     compileOnly 'org.bukkit:craftbukkit:1.16.5-R0.1-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    compile 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compile project(":plugin-dark-lib")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")

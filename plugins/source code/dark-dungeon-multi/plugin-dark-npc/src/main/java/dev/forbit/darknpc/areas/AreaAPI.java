@@ -39,13 +39,56 @@ import java.util.UUID;
 
 /**
  * REFACTOR refactor the menu mess.
- *
  */
 public class AreaAPI {
-    @Getter DarkNpc main;
-    @Getter HashMap<NPC, OfflinePlayer> npcs = new HashMap<>();
+    @Getter
+    DarkNpc main;
+    @Getter
+    HashMap<NPC, OfflinePlayer> npcs = new HashMap<>();
 
-    public AreaAPI(DarkNpc main) { this.main = main; }
+    public AreaAPI(DarkNpc main) {
+        this.main = main;
+    }
+
+    /* WORLD EDIT UTILS */
+    public static void pasteArea(String schematicFile, Location pasteLocation) {
+        System.out.println("Pasting " + schematicFile + " at " + pasteLocation);
+        assert (pasteLocation.getWorld() != null);
+        // paste #schematic at #location
+        File file = new File(schematicFile);
+        if (!file.exists()) {
+            return;
+        }
+        BukkitWorld world = new BukkitWorld(pasteLocation.getWorld());
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
+        assert (format != null);
+        Clipboard clipboard = null;
+        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+            clipboard = reader.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (clipboard == null) {
+            return;
+        }
+        try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1)) {
+            ClipboardHolder holder = new ClipboardHolder(clipboard);
+            Operation operation = holder.createPaste(editSession)
+                                        .to(BlockVector3.at(
+                                                pasteLocation.getBlockX(),
+                                                pasteLocation.getBlockY(),
+                                                pasteLocation.getBlockZ()
+                                        ))
+                                        .ignoreAirBlocks(false)
+                                        .copyBiomes(false)
+                                        .copyEntities(false)
+                                        .build();
+            Operations.complete(operation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Pasted " + schematicFile + " at " + pasteLocation); // OUTPUT pasted area
+    }
 
     public void initArea(UUID id) {
         Position pos = Generator.getAPI().getCell(id);
@@ -76,7 +119,6 @@ public class AreaAPI {
         return getMain().getPlayerAreas().get(oPlayer.getUniqueId());
     }
 
-
     /* UNLOCK NPC MENU */
     public DarkMenu getUnlockNPCMenu(DarkMenu mainMenu, PlayerArea area) {
         DarkMenu menu = new DarkMenu(ChatColor.LIGHT_PURPLE + "Unlock NPCs");
@@ -95,8 +137,7 @@ public class AreaAPI {
     public MenuItem getUnlockItem(DarkMenu menu, NPCType t, PlayerArea area) {
         if (area.getArea(t).getLevel() > 0) {
             return new BasicItem(t.getMenuMaterial(), "&7" + t.getTitle(), "&8Already Unlocked", null);
-        }
-        else {
+        } else {
             return new MenuNavItem(t.getMenuMaterial(), "&f" + t.getTitle(), null, getUnlockMenu(menu, area, t));
         }
     }
@@ -111,7 +152,6 @@ public class AreaAPI {
         menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cCancel", null, null), 3);
         return menu;
     }
-
 
     /* UPGRADE AREA MENU */
     public DarkMenu getUpgradeNPCMenu(DarkMenu mainMenu, PlayerArea area) {
@@ -128,12 +168,22 @@ public class AreaAPI {
     public MenuItem getUpgradeItem(DarkMenu upgradeMenu, NPCType t, PlayerArea area) {
         int currentLevel = area.getArea(t).getLevel();
         if (currentLevel <= 0) {
-            return new BasicItem(t.getMenuMaterial(), "&7" + t.getTitle(), "&cYou need to unlock &cthis NPC first!", null);
+            return new BasicItem(
+                    t.getMenuMaterial(),
+                    "&7" + t.getTitle(),
+                    "&cYou need to unlock &cthis NPC first!",
+                    null
+            );
         } else {
             if (currentLevel >= t.getMaxLevel()) {
                 return new BasicItem(t.getMenuMaterial(), "&7" + t.getTitle(), "&8Already max level", null);
             } else {
-                return new MenuNavItem(t.getMenuMaterial(), "&f" + t.getTitle(), null, getUpgradeMenu(upgradeMenu, area, t, currentLevel));
+                return new MenuNavItem(
+                        t.getMenuMaterial(),
+                        "&f" + t.getTitle(),
+                        null,
+                        getUpgradeMenu(upgradeMenu, area, t, currentLevel)
+                );
             }
         }
     }
@@ -142,10 +192,15 @@ public class AreaAPI {
         DarkMenu menu = new DarkMenu(ChatColor.GREEN + "Upgrade to level " + (currentLevel + 1) + "?");
         menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aConfirm", null, () -> {
             boolean upgrade = (area.upgrade(t)); // shouldn't be able to upgrade an npc unless they've been unlocked.
-            assert(upgrade);
+            assert (upgrade);
             getUpgradeNPCMenu(getManagerMenu(area), area).show(upgradeMenu.getPlayer());
         }), 5);
-        menu.addItem(new BasicItem(t.getMenuMaterial(), t.getTitle(), "&7Cost: " + (currentLevel * 1000) + " silver", null), 3);
+        menu.addItem(new BasicItem(
+                t.getMenuMaterial(),
+                t.getTitle(),
+                "&7Cost: " + (currentLevel * 1000) + " silver",
+                null
+        ), 3);
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, upgradeMenu), 0);
         return menu;
     }
@@ -162,14 +217,32 @@ public class AreaAPI {
     }
 
     public MenuItem getAreaItem(DarkMenu previousMenu, int id, PlayerArea area) {
-        if (area.getUnlockedAreas() < id) { return new BasicItem(Material.RED_STAINED_GLASS_PANE, "Area " + (id + 1), "&cYou need to unlock &cthis area first!", null); }
-        if (!area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
-            return new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "Area " + (id + 1), "&8This area is empty!", getManageAreaMenu(previousMenu, null, area, id));
+        if (area.getUnlockedAreas() < id) {
+            return new BasicItem(
+                    Material.RED_STAINED_GLASS_PANE,
+                    "Area " + (id + 1),
+                    "&cYou need to unlock &cthis area first!",
+                    null
+            );
         }
-        else {
+        if (!area.getCurrentAreas().containsKey(id) || area.getCurrentAreas().get(id) == null) {
+            return new MenuNavItem(
+                    Material.GREEN_STAINED_GLASS_PANE,
+                    "Area " + (id + 1),
+                    "&8This area is empty!",
+                    getManageAreaMenu(previousMenu, null, area, id)
+            );
+        } else {
             NPCType type = area.getCurrentAreas().get(id);
-            String lore = type.isLevel() ? "&7NPC: &5"+type.getTitle()+" #{newline} &7Level: &d"+area.getArea(type).getLevel() : "&7NPC: &5"+type.getTitle();
-            return new MenuNavItem(type.getMenuMaterial(), "Area "+(id+1), lore , getManageAreaMenu(previousMenu, area.getArea(type), area, id));
+            String lore = type.isLevel() ? "&7NPC: &5" + type.getTitle() + " #{newline} &7Level: &d" + area
+                    .getArea(type)
+                    .getLevel() : "&7NPC: &5" + type.getTitle();
+            return new MenuNavItem(
+                    type.getMenuMaterial(),
+                    "Area " + (id + 1),
+                    lore,
+                    getManageAreaMenu(previousMenu, area.getArea(type), area, id)
+            );
         }
     }
 
@@ -178,10 +251,19 @@ public class AreaAPI {
         DarkMenu menu;
         if (area == null || area.getType() == null) {
             menu = new DarkMenu("Managing area");
-            menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", "&4There is no NPC at &4this area!", null), 3);
-            menu.addItem(new MenuNavItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", null, getAddNPCMenu(menu, id, playerArea)), 5);
-        }
-        else {
+            menu.addItem(new BasicItem(
+                    Material.RED_STAINED_GLASS_PANE,
+                    "&cClear Area",
+                    "&4There is no NPC at &4this area!",
+                    null
+            ), 3);
+            menu.addItem(new MenuNavItem(
+                    Material.GREEN_STAINED_GLASS_PANE,
+                    "&aAdd NPC",
+                    null,
+                    getAddNPCMenu(menu, id, playerArea)
+            ), 5);
+        } else {
             menu = new DarkMenu("Manage " + area.getType().getTitle() + " Area");
             if (area.getType() != null) {
                 menu.addItem(new BasicItem(Material.RED_STAINED_GLASS_PANE, "&cClear Area", null, () -> {
@@ -190,7 +272,12 @@ public class AreaAPI {
                 }), 3);
                 // IDEA could just remove this?
                 //menu.addItem(new BasicItem(Material.GRAY_STAINED_GLASS_PANE, "&7Change NPC", null, null), 4); // TODO change npc (select npc to add except remove old npc once selected)
-                menu.addItem(new BasicItem(Material.GREEN_STAINED_GLASS_PANE, "&aAdd NPC", "&8There is already an &8NPC here!", null), 5);
+                menu.addItem(new BasicItem(
+                        Material.GREEN_STAINED_GLASS_PANE,
+                        "&aAdd NPC",
+                        "&8There is already an &8NPC here!",
+                        null
+                ), 5);
             }
         }
         menu.addItem(new MenuNavItem(Material.RED_STAINED_GLASS_PANE, "&4Back", null, manageAreaMenu), 0);
@@ -204,7 +291,7 @@ public class AreaAPI {
         List<NPCType> list = playerArea.getAvailableNPCS();
         int pos = 1;
         for (NPCType type : list) {
-            String lore = type.isLevel() ? "&7Level &f"+playerArea.getArea(type).getLevel() : null;
+            String lore = type.isLevel() ? "&7Level &f" + playerArea.getArea(type).getLevel() : null;
             menu.addItem(new BasicItem(type.getMenuMaterial(), "&f" + type.getTitle(), lore, () -> {
                 playerArea.setArea(id, type);
                 getManageAreasMenu(getManagerMenu(playerArea), playerArea).show(managerAreasMenu.getPlayer());
@@ -216,43 +303,18 @@ public class AreaAPI {
     /* NPC MANAGER MENU */
     public DarkMenu getManagerMenu(PlayerArea playerArea) {
         DarkMenu menu = new DarkMenu(ChatColor.DARK_PURPLE + "Manage NPCs");
-        menu.addItem(new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu(menu, playerArea)), 2);
-        menu.addItem(new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu(menu, playerArea)), 4);
-        menu.addItem(new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu(menu, playerArea)), 6);
+        menu.addItem(
+                new MenuNavItem(Material.GOLD_NUGGET, "&6Unlock NPC", null, getUnlockNPCMenu(menu, playerArea)),
+                2
+        );
+        menu.addItem(
+                new MenuNavItem(Material.IRON_BLOCK, "&fManage Areas", null, getManageAreasMenu(menu, playerArea)),
+                4
+        );
+        menu.addItem(
+                new MenuNavItem(Material.GOLD_INGOT, "&dUpgrade NPCs", null, getUpgradeNPCMenu(menu, playerArea)),
+                6
+        );
         return menu;
-    }
-
-
-
-    /* WORLD EDIT UTILS */
-    public static void pasteArea(String schematicFile, Location pasteLocation) {
-        System.out.println("Pasting "+schematicFile+" at "+pasteLocation);
-        assert (pasteLocation.getWorld() != null);
-        // paste #schematic at #location
-        File file = new File(schematicFile);
-        if (!file.exists()) { return; }
-        BukkitWorld world = new BukkitWorld(pasteLocation.getWorld());
-        ClipboardFormat format = ClipboardFormats.findByFile(file);
-        assert (format != null);
-        Clipboard clipboard = null;
-        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
-            clipboard = reader.read();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (clipboard == null) { return; }
-        try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1)) {
-            ClipboardHolder holder = new ClipboardHolder(clipboard);
-            Operation operation = holder.createPaste(editSession)
-                                        .to(BlockVector3.at(pasteLocation.getBlockX(), pasteLocation.getBlockY(), pasteLocation.getBlockZ()))
-                                        .ignoreAirBlocks(false)
-                                        .copyBiomes(false)
-                                        .copyEntities(false)
-                                        .build();
-            Operations.complete(operation);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("Pasted "+schematicFile+" at "+pasteLocation); // OUTPUT pasted area
     }
 }

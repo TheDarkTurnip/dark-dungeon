@@ -35,9 +35,11 @@ repositories {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
-    compile project(":plugin-dark-generator")
+    compileOnly project(":plugin-dark-generator")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 }
 
 processResources {
