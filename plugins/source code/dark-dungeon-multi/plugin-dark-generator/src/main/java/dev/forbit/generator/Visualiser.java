@@ -7,6 +7,8 @@ import dev.forbit.generator.generator.Tile;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A utility class that helps to visualise a dungeon's layout
@@ -15,6 +17,7 @@ import java.awt.image.BufferedImage;
  * @author <a href="https://forbit.dev">Forbit</a>
  */
 public class Visualiser {
+
 	public static void main(String[] args) {
 		int level = 10;
 		if (args.length >= 1) { level = Integer.parseInt(args[0]); }
@@ -25,8 +28,9 @@ public class Visualiser {
 		graphics.setColor(Color.getColor("#151515"));
 		graphics.fillRect(-1, -1, 402, 402);
 		draw(f, graphics);
-		JOptionPane.showMessageDialog(null, new ImageIcon(image));
+		if (args.length == 1) JOptionPane.showMessageDialog(null, new ImageIcon(image), "Dungeon", JOptionPane.INFORMATION_MESSAGE);
 	}
+
 
 	private static void draw(Floor f, Graphics2D graphics) {
 		for (Tile t : f.getTiles()) {
@@ -40,11 +44,10 @@ public class Visualiser {
 				} else {
 					graphics.setPaint(Color.GREEN);
 				}
-				graphics.fillRect(t.getX() * 32, t.getY() * 32, 32, 32);
 			} else {
 				graphics.setPaint(Color.GRAY);
-				graphics.fillRect(t.getX() * 32, t.getY() * 32, 32, 32);
 			}
+			graphics.fillRect(t.getX() * 32, t.getY() * 32, 32, 32);
 		}
 	}
 }

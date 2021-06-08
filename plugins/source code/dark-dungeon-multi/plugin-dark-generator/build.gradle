@@ -33,6 +33,7 @@ repositories {
         url = uri("https://mvn.intellectualsites.com/content/repositories/releases/")
     }
 }
+
 dependencies {
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
@@ -42,6 +43,9 @@ dependencies {
     compile project(":plugin-dark-world")
     compile project(":plugin-dark-spawners")
     implementation 'com.elmakers.mine.bukkit:EffectLib:8.0'
+    compile 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.0.0'
+
 }
 
 processResources {

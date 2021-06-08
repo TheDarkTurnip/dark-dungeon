@@ -38,7 +38,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -67,67 +69,99 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
      * @see #getInstance()
      * @deprecated
      */
-    @Deprecated private static Generator instance;
+    @Deprecated
+    private static Generator instance;
     /**
      * The GeneratorAPI.
      */
     private static GeneratorAPI API;
-    @Getter @Setter private static EffectManager effectManager;
+    @Getter
+    @Setter
+    private static EffectManager effectManager;
     /**
      * The point where the player base ends, and the player dungeon generation
      * begins.
      */
-    @Getter private final int topY = 140;
+    @Getter
+    private final int topY = 140;
     /**
      * Stores a list of player cells <a href="#{@link}">{@link Position}</a>
      */
-    @Getter List<Position> cells = new ArrayList<>();
+    @Getter
+    List<Position> cells = new ArrayList<>();
     /**
      * A seperate thread to run tasks relating to generating levels, so they don't
      * block the server's main thread.
      */
-    @Getter GenThread generatorTasks = new GenThread(this);
+    @Getter
+    GenThread generatorTasks = new GenThread(this);
     /**
      * Hosts a map of {@link PlayerDungeon}s, which store information regarding
      * dungeon generation.
      */
-    @Getter HashMap<UUID, PlayerDungeon> instances = new HashMap<>();
+    @Getter
+    HashMap<UUID, PlayerDungeon> instances = new HashMap<>();
     /**
      * The directory to use to store the player dungeons.
      */
-    @Getter File playerDungeonDir;
+    @Getter
+    File playerDungeonDir;
     /**
      * These worlds are generated {@link #onEnable}
      */
-    @Getter @Setter private World playerWorld, schemWorld;
+    @Getter
+    @Setter
+    private World playerWorld, schemWorld;
     /**
      * The row that we are currently at, in terms of positional square
      * <p>
      * The size of cells should always be less than maxRow^2
      * </p>
      */
-    @Getter @Setter private int maxRow = 0;
+    @Getter
+    @Setter
+    private int maxRow = 0;
+
+
+    /* ----------------------------------------------------------------------- */
+    /* |						PLUGIN FUNCTIONS	 						 | */
+    /* ----------------------------------------------------------------------- */
+
+    // These constructors are necessary for mocking testing
+
+    public Generator() {
+        super();
+
+    }
+
+    public Generator(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+
+        super(loader, description, dataFolder, file);
+
+    }
 
     /**
      * Returns the instance of GeneratorAPI
      */
-    public static GeneratorAPI getAPI() { return API; }
+    public static GeneratorAPI getAPI() {
+        return API;
+    }
 
     /**
      * Method for staticly retrieving the instance of this plugin
      *
      * @return Generator.instance
      */
-    public static Generator getInstance() { return instance; }
-    /* ----------------------------------------------------------------------- */
-    /* |						PLUGIN FUNCTIONS	 						 | */
-    /* ----------------------------------------------------------------------- */
+    public static Generator getInstance() {
+        return instance;
+    }
 
     /**
      * Loads directories, registers events, starts the generatorTasks thread, makes
      * the schem_world and player_world, and finally loads playerdungeon data.
      */
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         API = new GeneratorAPI(this);
         instance = this;
         setEffectManager(new EffectManager(this));
@@ -142,7 +176,8 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
         }
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         try {
             save();
         } catch (IOException e) {
@@ -193,9 +228,14 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
         return true;
     }
 
-    @EventHandler public void onMove(PlayerMoveEvent event) {
-        if (event.getTo() == null) { return; }
-        if (event.getFrom().getWorld() == null || !event.getFrom().getWorld().equals(getPlayerWorld())) { return; }
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        if (event.getTo() == null) {
+            return;
+        }
+        if (event.getFrom().getWorld() == null || !event.getFrom().getWorld().equals(getPlayerWorld())) {
+            return;
+        }
         if (event.getTo().getBlock().getType().equals(Material.END_PORTAL)) {
             // travel to boss room
             getLogger().info("travel to boss room");
@@ -209,11 +249,18 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
      *
      * @param event Player Interact Event
      */
-    @EventHandler public void onClick(PlayerInteractEvent event) {
-        if (!event.getHand().equals(EquipmentSlot.HAND)) { return; }
-        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) { return; }
+    @EventHandler
+    public void onClick(PlayerInteractEvent event) {
+        if (!event.getHand().equals(EquipmentSlot.HAND)) {
+            return;
+        }
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            return;
+        }
         Block b = event.getClickedBlock();
-        if (b == null) { return; }
+        if (b == null) {
+            return;
+        }
         if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.FERMENTED_SPIDER_EYE)) {
             getAPI().printTile(getAPI().getTile(b.getLocation()), event.getPlayer());
         } else {
@@ -230,36 +277,56 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
 
     /**
      * Unlocks an area (such as a boss room, ladder down or loot room)
+     *
      * @param location location of one block inside the room
-     * @param player player that is unlocking the tile.
+     * @param player   player that is unlocking the tile.
      */
     private void unlockArea(Location location, Player player) {
         // gets data about location
         Position pos = getAPI().getPosition(location);
         Tile t = getAPI().getTile(location);
         Floor f = getAPI().getFloor(location);
-        assert(f != null);
-        assert(t != null);
-        assert(pos != null);
-        int keys = DarkLib.getPlayerAPI().getKeys(pos.getOwner(), DarkWorld.DUNGEON); // get the amount of keys the player has
+        assert (f != null);
+        assert (t != null);
+        assert (pos != null);
+        int keys = DarkLib.getPlayerAPI().getKeys(
+                pos.getOwner(),
+                DarkWorld.DUNGEON
+        ); // get the amount of keys the player has
         if (keys > 0) {
             // unlock loot room
-            unlockTile(pos, f , t);
+            unlockTile(pos, f, t);
             effect(location.add(0.5, -1.0, 0.5), player);
             DarkLib.getPlayerAPI().withdrawKeys(pos.getOwner(), DarkWorld.DUNGEON, 1);
-        }
-        else {
+        } else {
             // not enough keys
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7You &cdon't &7have enough &6keys &7to unlock this room!"));
+            player.sendMessage(ChatColor.translateAlternateColorCodes(
+                    '&',
+                    "&7You &cdon't &7have enough &6keys &7to unlock this room!"
+            ));
         }
     }
 
 
     private void effect(Location location, Player player) {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            getEffectManager().display(Particle.VILLAGER_ANGRY, location, 0.0f, 0.0f, 0.0f, 0.1f, 1, 1, Color.YELLOW, null, (byte) 0, 15.0d, new ArrayList<Player>() {{
-                add(player);
-            }});
+            getEffectManager().display(
+                    Particle.VILLAGER_ANGRY,
+                    location,
+                    0.0f,
+                    0.0f,
+                    0.0f,
+                    0.1f,
+                    1,
+                    1,
+                    Color.YELLOW,
+                    null,
+                    (byte) 0,
+                    15.0d,
+                    new ArrayList<Player>() {{
+                        add(player);
+                    }}
+            );
             player.playSound(location, Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.BLOCKS, 1.0f, 2.0f);
         });
     }
@@ -270,7 +337,9 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
     private void makeDir() {
         playerDungeonDir = new File(this.getDataFolder() + "/cells");
         try {
-            if (!playerDungeonDir.exists()) { playerDungeonDir.mkdirs(); }
+            if (!playerDungeonDir.exists()) {
+                playerDungeonDir.mkdirs();
+            }
         } catch (SecurityException exception) {
             exception.printStackTrace();
         }
@@ -346,7 +415,11 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson g = gsonBuilder.create();
         List<String> list = getConfig().getStringList("cells");
-        if (!list.isEmpty()) { for (String s : list) { cells.add(g.fromJson(s, Position.class)); } }
+        if (!list.isEmpty()) {
+            for (String s : list) {
+                cells.add(g.fromJson(s, Position.class));
+            }
+        }
         maxRow = getConfig().getInt("maxRow");
 
         // load dungeons
@@ -370,13 +443,17 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
      *
      * @param x x position
      * @param y y position
-     *
      * @return Position if found, or null
      */
-    @Nullable public Position getCell(int x, int y) {
+    @Nullable
+    public Position getCell(int x, int y) {
         for (Position p : getCells()) {
-            if (p == null) { continue; }
-            if (p.getGridX() == x && p.getGridY() == y) { return p; }
+            if (p == null) {
+                continue;
+            }
+            if (p.getGridX() == x && p.getGridY() == y) {
+                return p;
+            }
         }
         return null;
     }
@@ -390,28 +467,44 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
         int rel_z = t.getY() * 21;
         int rel_y = (f.getLevel() - 1) * 9;
 
-        Location location = new Location(getPlayerWorld(), cell.getGridX() * 1000 + rel_x, topY - rel_y, cell.getGridY() * 1000 + rel_z);
+        Location location = new Location(
+                getPlayerWorld(),
+                cell.getGridX() * 1000 + rel_x,
+                topY - rel_y,
+                cell.getGridY() * 1000 + rel_z
+        );
 
         if (!t.isEnd()) {
             // remove black concrete and gold blocks.
-            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> getAPI().getWorldEditUtils().clearLootRoom(location));
+            Bukkit.getScheduler().runTaskAsynchronously(
+                    instance,
+                    () -> getAPI().getWorldEditUtils().clearLootRoom(location)
+            );
             getLogger().info("cleared loot room");
-        }
-        else {
+        } else {
             if (f.getUnexplored() <= 1) {
                 // set to staircase down
-                Bukkit.getScheduler().runTaskAsynchronously(instance, () -> getAPI().getWorldEditUtils().pasteCell("stair/stair_" + bitwise, location));
+                Bukkit.getScheduler().runTaskAsynchronously(
+                        instance,
+                        () -> getAPI()
+                                .getWorldEditUtils()
+                                .pasteCell("stair/stair_" + bitwise, location)
+                );
                 t.setStair(true);
                 getLogger().info("pasted stair room");
                 // generate next level
                 scheduleGen(cell.getOwner(), f.getLevel());
                 // i dont know about this!
 
-            }
-            else {
+            } else {
                 // set to boss room
                 // pasteCell(boss_bitwise @ location)
-                Bukkit.getScheduler().runTaskAsynchronously(instance, () -> getAPI().getWorldEditUtils().pasteCell("boss_" + bitwise, location));
+                Bukkit.getScheduler().runTaskAsynchronously(
+                        instance,
+                        () -> getAPI()
+                                .getWorldEditUtils()
+                                .pasteCell("boss_" + bitwise, location)
+                );
                 getLogger().info("pasted boss room");
             }
         }
@@ -435,19 +528,35 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
         generatorTasks.addTask(() -> {
             Floor f = getAPI().generateLevel(id, i);
             generatorTasks.addTask(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     int max_x = 0, max_z = 0;
                     int min_x = Integer.MAX_VALUE, min_z = Integer.MAX_VALUE;
                     for (Tile t : f.getTiles()) {
-                        if (t.getBitwise() == 0) { continue; }
+                        if (t.getBitwise() == 0) {
+                            continue;
+                        }
                         int rel_x = t.getX() * 21;
                         int rel_z = t.getY() * 21;
                         int rel_y = i * 9;
-                        if (rel_x > max_x) { max_x = rel_x; }
-                        if (rel_z > max_z) { max_z = rel_z; }
-                        if (rel_x < min_x) { min_x = rel_x; }
-                        if (rel_z < min_z) { min_z = rel_z; }
-                        Location location = new Location(getPlayerWorld(), (cell.getGridX() * 1000) + rel_x, topY - rel_y, (cell.getGridY() * 1000) + rel_z);
+                        if (rel_x > max_x) {
+                            max_x = rel_x;
+                        }
+                        if (rel_z > max_z) {
+                            max_z = rel_z;
+                        }
+                        if (rel_x < min_x) {
+                            min_x = rel_x;
+                        }
+                        if (rel_z < min_z) {
+                            min_z = rel_z;
+                        }
+                        Location location = new Location(
+                                getPlayerWorld(),
+                                (cell.getGridX() * 1000) + rel_x,
+                                topY - rel_y,
+                                (cell.getGridY() * 1000) + rel_z
+                        );
                         String cell;
                         if (t.isStart()) {
                             if (i > 0) {
@@ -457,25 +566,25 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
                                     // would happen if floor(0) hasnt been generated.
                                     getLogger().severe("END TILE IS NULL!");
                                     cell = "start" + t.getBitwise();
-                                }
-                                else {
+                                } else {
                                     cell = "land/land_" + t.getBitwise() + "_" + end.getBitwise();
                                 }
-                            }
-                            else {
+                            } else {
                                 cell = "start_" + t.getBitwise();
                             }
-                        }
-                        else if (t.isEnd()) {
+                        } else if (t.isEnd()) {
                             cell = "end_" + t.getBitwise();
-                        }
-                        else if (t.isLoot()) {
+                        } else if (t.isLoot()) {
                             cell = "loot_" + t.getBitwise();
-                        }
-                        else {
+                        } else {
                             cell = getRandomCell(Biome.NORMAL, t.getBitwise());
                         }
-                        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> getAPI().getWorldEditUtils().pasteCell(cell, location));
+                        Bukkit.getScheduler().runTaskAsynchronously(
+                                instance,
+                                () -> getAPI()
+                                        .getWorldEditUtils()
+                                        .pasteCell(cell, location)
+                        );
                     }
                     max_x += 21;
                     max_z += 21;
@@ -503,7 +612,10 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
                         int end_y = 140 - (i + 1) * 9 + cell.getGridX() * 1000;
                         int end_z = max_z + cell.getGridY() * 1000 + 21;
                         final Material spawnerBlock = Material.REDSTONE_BLOCK;
-                        Region region = new CuboidRegion(BlockVector3.at(start_x, start_y, start_z), BlockVector3.at(end_x, end_y, end_z));
+                        Region region = new CuboidRegion(
+                                BlockVector3.at(start_x, start_y, start_z),
+                                BlockVector3.at(end_x, end_y, end_z)
+                        );
                         // TODO run this async
                         List<Location> spawners = new ArrayList<>();
                         for (BlockVector3 b3 : region) {
@@ -513,16 +625,31 @@ public class Generator extends JavaPlugin implements Listener, CommandExecutor {
                             }
                         }
                         spawners.forEach((Location loc) -> {
-                            DarkSpawners.getApi().addPlayerSpawner(new MobGroupSpawner(loc, MobGroup.BASIC, (int) (1 + (i * 1.33))), id);
+                            DarkSpawners.getApi().addPlayerSpawner(new MobGroupSpawner(
+                                    loc,
+                                    MobGroup.BASIC,
+                                    (int) (1 + (i * 1.33))
+                            ), id);
                         });
 
                         try (@SuppressWarnings("deprecation") EditSession editSession = WorldEdit.getInstance()
                                                                                                  .getEditSessionFactory()
-                                                                                                 .getEditSession(new BukkitWorld(getPlayerWorld()), -1)) {
-                            Mask mask = new BlockMask(editSession.getExtent(), BukkitAdapter.adapt(spawnerBlock.createBlockData()).toBaseBlock());
+                                                                                                 .getEditSession(
+                                                                                                         new BukkitWorld(
+                                                                                                                 getPlayerWorld()),
+                                                                                                         -1
+                                                                                                 )) {
+                            Mask mask = new BlockMask(
+                                    editSession.getExtent(),
+                                    BukkitAdapter.adapt(spawnerBlock.createBlockData()).toBaseBlock()
+                            );
 
 
-                            editSession.replaceBlocks(region, mask, BukkitAdapter.adapt(Material.GRAY_CONCRETE.createBlockData()));
+                            editSession.replaceBlocks(
+                                    region,
+                                    mask,
+                                    BukkitAdapter.adapt(Material.GRAY_CONCRETE.createBlockData())
+                            );
                             editSession.flushQueue();
                         } catch (Exception e) {
                             e.printStackTrace();

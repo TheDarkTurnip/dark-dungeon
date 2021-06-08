@@ -1,8 +1,11 @@
+import org.gradle.api.tasks.testing.Test
+
 task delete(type: Delete) {
     doFirst {
         delete "jars"
     }
 }
+
 
 subprojects {
     apply plugin: 'java-library'
@@ -12,7 +15,29 @@ subprojects {
         into("../jars")
 
     }
+
     compileJava.finalizedBy(copy)
     compileJava.options.encoding = "UTF-8"
 
+
+    def test = tasks.named("test") {
+        useJUnitPlatform {
+            excludeTags "slow"
+        }
+    }
+
+    def slowTest = tasks.register("slowTest", Test) {
+        useJUnitPlatform {
+            includeTags "slow"
+        }
+        shouldRunAfter test
+    }
+
+    tasks.named("check") {
+        dependsOn slowTest
+    }
+
+
 }
+
+

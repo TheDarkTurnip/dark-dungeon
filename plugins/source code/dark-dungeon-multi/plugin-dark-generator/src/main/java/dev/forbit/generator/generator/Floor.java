@@ -3,6 +3,7 @@ package dev.forbit.generator.generator;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +24,13 @@ public class Floor {
     /***
      * Makes a floor, and fills it with tiles equal to 0.
      *
-     * @param level level of floor
+     * @param level level of floor, must be < 1000
      */
     public Floor(Random random, int level) {
+        assert(level < 1000);
         setLevel(level);
         setRandom(random);
-        setSize(4 + (level / 2));
+        setSize((int) (4 + (level / 2f)));
         clearTiles();
     }
 
@@ -37,7 +39,11 @@ public class Floor {
      */
     public void clearTiles() {
         List<Tile> t = new ArrayList<>();
-        for (int x = 0; x < getSize(); x++) { for (int y = 0; y < getSize(); y++) { t.add(new Tile(x, y)); } }
+        for (int x = 0; x < getSize(); x++) {
+            for (int y = 0; y < getSize(); y++) {
+                t.add(new Tile(x, y));
+            }
+        }
         setTiles(t);
     }
 
@@ -56,7 +62,7 @@ public class Floor {
             }
             // generate bitwise values
             generateBitwise(getTiles());
-        } while (!generateLoot((level+1)/2));
+        } while (!generateLoot((level + 1) / 2));
         getTile(startX, startY).setStart(true);
     }
 
@@ -68,7 +74,6 @@ public class Floor {
      * @return false if couldn't generate rooms.
      */
     private boolean generateLoot(int i) {
-        System.out.println(i);
         List<Tile> possibles = new ArrayList<>();
         for (Tile t : getTiles()) {
             if (t.isValue() && (isStraightPath(t))) {
@@ -111,14 +116,6 @@ public class Floor {
         }
     }
 
-    /**
-     * Counts the entrances to a tile given it's {@link Tile#bitwise} value
-     *
-     * @param bitwise
-     *
-     * @return
-     */
-    private int countEntrances(int bitwise) { return Integer.bitCount(bitwise); }
 
     /**
      * Counts the total tiles.
@@ -159,7 +156,7 @@ public class Floor {
         for (Tile t : getTiles()) {
             if (t.isStart()) { return t; }
         }
-        return null;
+        throw new ArrayIndexOutOfBoundsException("Cant find start tile.");
     }
 
     /**

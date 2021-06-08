@@ -11,7 +11,7 @@ public class Generator {
     /**
      * Generates a new floor for the specified level.
      *
-     * @param level
+     * @param level must be below 1000
      *
      * @return
      */
@@ -19,6 +19,15 @@ public class Generator {
         Random random = new Random();
         return makeFloor(random, level);
     }
+
+    /**
+     *
+     * Generates a new floor with the start tile directly under #startBelow
+     *
+     * @param level must be < 1000
+     * @param startBelow
+     * @return
+     */
     public Floor generate(int level, Tile startBelow) {
         return makeFloor(new Random(), level, startBelow);
     }
@@ -26,20 +35,22 @@ public class Generator {
     /***
      * Makes a floor based on the given level
      *
-     * @param level
+     * @param level must be < 1000
      * @return
      */
     public Floor makeFloor(Random random, int level) {
         Floor floor;
         long seed;
+        int req_deadends = 2+(level/3);
+        int req_fifteens = (((4+level) * (4+level)) / 5);
         do {
             seed = random.nextLong();
             random.setSeed(seed);
             floor = new Floor(random, level);
             floor.generateTiles(random.nextInt(floor.getSize() - 1) + 1, random.nextInt(floor.getSize() - 1) + 1);
             makeDeadEnds(random, floor);
-        } while (!floor.getStart().isEnd() || countDeadends(floor) != 2 + (level / 3) || count15(floor) > (((4 + level) * (4 + level)) / 5));
-        System.out.println("Seed: " + seed);
+
+        } while (!floor.getStart().isEnd() || countDeadends(floor) != req_deadends || count15(floor) > req_fifteens);
         return floor;
     }
 
@@ -53,7 +64,6 @@ public class Generator {
             floor.generateTiles(startBelow.getX(), startBelow.getY());
             makeDeadEnds(random, floor);
         } while (!floor.getStart().isEnd() || countDeadends(floor) != 2 + (level / 3) || count15(floor) > (((4 + level) * (4 + level)) / 5));
-        System.out.println("Seed: " + seed);
         return floor;
 
     }

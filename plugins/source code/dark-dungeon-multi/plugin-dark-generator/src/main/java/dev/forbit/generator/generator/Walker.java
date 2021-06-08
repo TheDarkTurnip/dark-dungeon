@@ -18,7 +18,7 @@ public @Data class Walker {
 	int walkStartX, walkStartY;
 	List<Tile> tiles;
 	Random random;
-	int lastDirection = 2;
+	int lastDirection;
 
 	public Walker(Random random, List<Tile> list) {
 		setRandom(random);
@@ -46,8 +46,8 @@ public @Data class Walker {
 
 	public void randomDirection() {
 		int newDirection = getRandom().nextInt(4);
-		if (getRandom().nextInt(4) < 3) { newDirection = lastDirection; }
-		lastDirection = newDirection;
+		if (getRandom().nextInt(4) < 3) { newDirection = getLastDirection(); }
+		setLastDirection(newDirection);
 		switch (newDirection) {
 			case 0: // up
 				setY(getY() - 1);
@@ -66,8 +66,6 @@ public @Data class Walker {
 
 	public Tile getTile(int x, int y) {
 		for (Tile t : getTiles()) {
-			if (t == null)
-				continue;
 			if (t.getX() == x && t.getY() == y) { return t; }
 		}
 		return null;
