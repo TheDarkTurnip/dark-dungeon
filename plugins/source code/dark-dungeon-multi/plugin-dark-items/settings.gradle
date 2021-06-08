@@ -1,3 +1,0 @@
-rootProject.name = 'dark-items'
-include ':plugin-dark-lib'
-project(":plugin-dark-lib").projectDir = new File(rootProject.projectDir,"../plugin-dark-lib")

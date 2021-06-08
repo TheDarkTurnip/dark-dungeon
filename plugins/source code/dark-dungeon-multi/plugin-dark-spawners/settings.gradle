@@ -1,5 +1,0 @@
-rootProject.name = 'dark-spawners'
-include ':plugin-dark-lib'
-project(":plugin-dark-lib").projectDir = new File(rootProject.projectDir,"../plugin-dark-lib")
-include ':plugin-dark-items'
-project(":plugin-dark-items").projectDir = new File(rootProject.projectDir,"../plugin-dark-items")

@@ -1,7 +1,0 @@
-name: dark-spawners
-version: @version@
-main: dev.forbit.spawners.DarkSpawners
-api-version: 1.16
-authors: [ forbit ]
-description: Spawner Manager
-website: forbit.dev

@@ -1,9 +1,0 @@
-name: dark-portal
-version: @version@
-main: dev.forbit.portal.PortalMain
-api-version: 1.16
-authors: [ Forbit ]
-description: Handles all the portals for DarkDungeon
-website: forbit.dev
-depend: [ dark-generator ]
-softdepend: [ dark-world ]
