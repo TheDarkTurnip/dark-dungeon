@@ -1,0 +1,59 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'java-library'
+}
+
+ext {
+    lombokVersion = '1.18.20'
+}
+
+group = 'dev.forbit'
+version = '1.6.2-SNAPSHOT'
+jar.archiveBaseName='dark-generator'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+
+    // FAWE
+    maven {
+        url = uri("https://mvn.intellectualsites.com/content/repositories/releases/")
+    }
+}
+dependencies {
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    implementation 'org.jetbrains:annotations:20.1.0'
+    compile 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    compile("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
+    compile project(":plugin-dark-world")
+    compile project(":plugin-dark-spawners")
+    implementation 'com.elmakers.mine.bukkit:EffectLib:8.0'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+
+/*task copy(type: Copy) {
+    from("/build/libs")
+    into("../jars")
+}
+
+compileJava.finalizedBy(copy)*/

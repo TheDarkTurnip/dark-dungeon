@@ -1,0 +1,7 @@
+name: dark-world
+version: @version@
+main: dev.forbit.world.DarkWorld
+api-version: 1.16
+authors: [ forbit ]
+website: forbit.dev
+load: STARTUP

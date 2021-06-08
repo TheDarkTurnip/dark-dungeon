@@ -1,0 +1,47 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'java-library'
+}
+
+ext {
+    lombokVersion = '1.18.20'
+}
+group = 'dev.forbit'
+version = '1.1.1-SNAPSHOT'
+jar.archiveBaseName='dark-npc'
+
+sourceCompatibility = "1.9"
+targetCompatibility = "1.9"
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    // FAWE
+    maven {
+        url = uri("https://mvn.intellectualsites.com/content/repositories/releases/")
+    }
+}
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    compile project(":plugin-dark-generator")
+    compile("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
+    compile("net.jitse:npclib-api:2.11.1-SNAPSHOT")
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
