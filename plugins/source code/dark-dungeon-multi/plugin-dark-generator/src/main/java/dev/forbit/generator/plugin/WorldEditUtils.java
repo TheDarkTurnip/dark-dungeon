@@ -77,7 +77,7 @@ public class WorldEditUtils {
      */
     public void pasteArea(Location point) {
         if (getGen().isTest()) return;
-        File file = new File("plugins/FastAsyncWorldEdit/schematics/player_base.schem"); // load schematic
+        File file = new File("plugins/FastAsyncWorldEdit/schematics/player_base_2.schem"); // load schematic
         BukkitWorld world = new BukkitWorld(getGen().getPlayerWorld()); // load world.
         ClipboardFormat format = ClipboardFormats.findByFile(file); // load clipboard format
         Clipboard clipboard = null;
