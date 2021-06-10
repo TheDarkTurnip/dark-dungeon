@@ -35,12 +35,12 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
-    compile project(":plugin-dark-generator")
-    compile project(":plugin-dark-lib")
-    compile("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
-    compile("net.jitse:npclib-api:2.11.1-SNAPSHOT")
-    compile 'org.junit.jupiter:junit-jupiter:5.7.2'
+    implementation 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    implementation project(":plugin-dark-generator")
+    implementation project(":plugin-dark-lib")
+    implementation("com.intellectualsites.fawe:FAWE-Bukkit:1.16-637")
+    implementation("net.jitse:npclib-api:2.12.1-SNAPSHOT")
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 }
 

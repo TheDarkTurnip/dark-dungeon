@@ -43,6 +43,7 @@ public class TestGenerator {
     @Test
     @DisplayName("Should generate large floor")
     @Tag("slow")
+    @Disabled
     void generateEdgeCase() {
         Floor f = generator.generate(100);
         Assertions.assertNotNull(f);

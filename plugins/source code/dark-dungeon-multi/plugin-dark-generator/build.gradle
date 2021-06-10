@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.elmakers.mine.bukkit:EffectLib:8.0'
 
     // tests
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    compile 'org.junit.jupiter:junit-jupiter:5.7.2'
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.16:1.1.0'
 
 }

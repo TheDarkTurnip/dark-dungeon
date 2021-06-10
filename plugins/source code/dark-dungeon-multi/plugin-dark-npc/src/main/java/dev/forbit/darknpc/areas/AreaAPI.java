@@ -22,6 +22,7 @@ import dev.forbit.library.menu.type.MenuNavItem;
 import lombok.Getter;
 import net.jitse.npclib.api.NPC;
 import net.jitse.npclib.api.skin.MineSkinFetcher;
+import net.jitse.npclib.api.skin.Skin;
 import net.jitse.npclib.api.state.NPCSlot;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -99,7 +100,7 @@ public class AreaAPI {
         area.setCenterZ(center.getZ());
         Location npcLoc = area.getNPCManagerLocation();
 
-        MineSkinFetcher.fetchSkinFromIdSync(524077545, (skin) -> {
+        /*MineSkinFetcher.fetchSkinFromIdSync(524077545, (skin) -> {
             NPC npc = getMain().getLibrary().createNPC(Utils.splitString(ChatColor.LIGHT_PURPLE + "NPC Manager", 100));
             npc.setLocation(npcLoc);
             npc.create();
@@ -107,7 +108,18 @@ public class AreaAPI {
             npc.setItem(NPCSlot.MAINHAND, new ItemStack(Material.GOLD_INGOT));
             npc.show(Bukkit.getOfflinePlayer(id).getPlayer());
             npcs.put(npc, Bukkit.getOfflinePlayer(id));
-        });
+        });*/
+
+        NPC npc = getMain().getLibrary().createNPC(Utils.splitString(ChatColor.LIGHT_PURPLE + "NPC Manager", 100));
+        npc.setLocation(npcLoc);
+        npc.create();
+        //MineSkinFetcher.fetchSkinFromIdSync(524077545, npc::setSkin);
+        npc.setItem(NPCSlot.MAINHAND, new ItemStack(Material.GOLD_INGOT));
+        npc.show(Bukkit.getOfflinePlayer(id).getPlayer());
+        npcs.put(npc, Bukkit.getOfflinePlayer(id));
+
+
+
         getMain().getPlayerAreas().put(id, area);
     }
 
