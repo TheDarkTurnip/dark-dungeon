@@ -7,10 +7,12 @@ import java.util.List;
 
 public enum EnchantType {
     MAGIC(Enchantment.STRENGTH, Enchantment.LOOTING, Enchantment.RANGE, Enchantment.BLEED, Enchantment.PIERCING,
-            Enchantment.ENERGISED),
+          Enchantment.ENERGISED
+    ),
     RANGED(Enchantment.POWER, Enchantment.LOOTING, Enchantment.FIRE, Enchantment.PIERCING, Enchantment.ENERGISED),
     MELEE(Enchantment.SHARPNESS, Enchantment.LOOTING, Enchantment.FIRE, Enchantment.PIERCING, Enchantment.BLEED,
-            Enchantment.BESERKER, Enchantment.ENERGISED, Enchantment.CUTDOWN),
+          Enchantment.BESERKER, Enchantment.ENERGISED, Enchantment.CUTDOWN
+    ),
     ARMOR(Enchantment.PROTECTION, Enchantment.THORNS);
 
     private List<Enchantment> enchantments = new ArrayList<Enchantment>();
@@ -19,10 +21,6 @@ public enum EnchantType {
         for (Enchantment e : enchants) {
             enchantments.add(e);
         }
-    }
-
-    public List<Enchantment> getEnchantments() {
-        return enchantments;
     }
 
     public static boolean isCompatible(Enchantment e, DarkItem dItem) {
@@ -39,5 +37,9 @@ public enum EnchantType {
         }
         return false;*/
         return true;
+    }
+
+    public List<Enchantment> getEnchantments() {
+        return enchantments;
     }
 }

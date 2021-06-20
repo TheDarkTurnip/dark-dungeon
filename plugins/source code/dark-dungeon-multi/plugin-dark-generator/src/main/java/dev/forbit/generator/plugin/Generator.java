@@ -185,6 +185,8 @@ public class Generator extends JavaPlugin implements Listener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println("Test: "+isTest());
     }
 
     @Override

@@ -35,9 +35,9 @@ public enum Rarity {
      */
     @Getter @Setter int weight;
 
-    Rarity(ChatColor color, int i, int weight) {
+    Rarity(ChatColor color, int value, int weight) {
         setColor(color);
-        setValue(i);
+        setValue(value);
         setWeight(weight);
 
     }
@@ -87,30 +87,6 @@ public enum Rarity {
      */
     public String getSecondaryColor() {
         return ChatColor.of(this.getColor().getColor().darker())+"";
-        /*switch (this) {
-            case JUNK:
-            case COMMON:
-            case UNCOMMON:
-                return ChatColor.DARK_GRAY + "";
-            case UNIQUE:
-                return ChatColor.GRAY + "";
-            case RARE:
-                return ChatColor.DARK_PURPLE + "";
-            case EPIC:
-                return ChatColor.DARK_BLUE + "";
-            case SUPER:
-                return ChatColor.DARK_AQUA + "";
-            case MASTERFUL:
-                return ChatColor.DARK_GREEN + "";
-            case LEGENDARY:
-                return ChatColor.GOLD + "";
-            case INSANE:
-                return ChatColor.DARK_RED + "";
-            case EXOTIC:
-                return ChatColor.of("#5c1e32") + "";
-            default:
-                return ChatColor.WHITE + "";
-        }*/
     }
 
     /**

@@ -18,16 +18,18 @@ public class DarkItemFactory {
         return random.nextBoolean() ? getRandomWeapon() : getRandomArmor();
     }
 
-
     public static ItemStack getRandomItem(float chestLevel) {
         Random random = new Random();
-        return random.nextBoolean() ? getArmorPiece(pickRandomArmor(), chestLevel / 30.0f) : getLevelledWeapon(pickRandomWeapon(), chestLevel / 30.0f);
+        return random.nextBoolean() ? getArmorPiece(pickRandomArmor(), chestLevel / 30.0f) : getLevelledWeapon(
+                pickRandomWeapon(),
+                chestLevel / 30.0f
+        );
 
     }
+
     /**
-     *
      * @param armorType
-     * @param level 0-1 (0 is basic wood item, 1 is plutonium)
+     * @param level     0-1 (0 is basic wood item, 1 is plutonium)
      * @return
      */
     public static ItemStack getArmorPiece(ArmorType armorType, float level) {
@@ -35,9 +37,8 @@ public class DarkItemFactory {
     }
 
     /**
-     *
      * @param weapon
-     * @param level 0-1 (0 is basic wood item, 1 is plutonium)
+     * @param level  0-1 (0 is basic wood item, 1 is plutonium)
      * @return
      */
     public static ItemStack getLevelledWeapon(WeaponType weapon, float level) {
@@ -45,16 +46,15 @@ public class DarkItemFactory {
     }
 
     /**
-     *
      * @param level 0-1 (0 is basic wood item, 1 is plutonium)
      * @return
      */
     public static ItemType getItemType(float level) {
         int max = ItemType.PLUTONIUM.getIdentifier();
-        float value = level*max;
+        float value = level * max;
         Random random = new Random();
-        float variation = (random.nextInt(2)-1) / 10.0f;
-        float n = value+variation;
+        float variation = (random.nextInt(2) - 1) / 10.0f;
+        float n = value + variation;
         for (ItemType t : ItemType.values()) {
             if (t.getIdentifier() < n) continue;
             return t;
@@ -121,7 +121,6 @@ public class DarkItemFactory {
         return DarkItems.getApi().infuseItem(darkArmor);
     }
 
-
     public static ItemStack getRandomArmor(ArmorType armorType) {
         DarkArmor darkArmor = new DarkArmor();
         darkArmor.setType(ItemType.pickRandom());
@@ -154,7 +153,6 @@ public class DarkItemFactory {
         } while (!darkArmor.getModifier().compatible(darkArmor));
         return DarkItems.getApi().infuseItem(darkArmor);
     }
-
 
     public static Material generateMaterial(WeaponType weapon, ItemType item) {
         if (weapon.equals(WeaponType.BOW)) {
