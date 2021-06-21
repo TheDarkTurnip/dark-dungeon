@@ -99,21 +99,11 @@ public class AreaAPI {
         area.setCenterY(center.getY());
         area.setCenterZ(center.getZ());
         Location npcLoc = area.getNPCManagerLocation();
-
-        /*MineSkinFetcher.fetchSkinFromIdSync(524077545, (skin) -> {
-            NPC npc = getMain().getLibrary().createNPC(Utils.splitString(ChatColor.LIGHT_PURPLE + "NPC Manager", 100));
-            npc.setLocation(npcLoc);
-            npc.create();
-            npc.setSkin(skin);
-            npc.setItem(NPCSlot.MAINHAND, new ItemStack(Material.GOLD_INGOT));
-            npc.show(Bukkit.getOfflinePlayer(id).getPlayer());
-            npcs.put(npc, Bukkit.getOfflinePlayer(id));
-        });*/
-
+        // make npc
         NPC npc = getMain().getLibrary().createNPC(Utils.splitString(ChatColor.LIGHT_PURPLE + "NPC Manager", 100));
         npc.setLocation(npcLoc);
         npc.create();
-        //MineSkinFetcher.fetchSkinFromIdSync(524077545, npc::setSkin);
+        MineSkinFetcher.fetchSkinFromIdSync(524077545, npc::setSkin);
         npc.setItem(NPCSlot.MAINHAND, new ItemStack(Material.GOLD_INGOT));
         npc.show(Bukkit.getOfflinePlayer(id).getPlayer());
         npcs.put(npc, Bukkit.getOfflinePlayer(id));
