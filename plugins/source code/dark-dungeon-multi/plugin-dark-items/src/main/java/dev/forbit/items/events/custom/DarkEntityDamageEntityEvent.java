@@ -5,6 +5,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
+/**
+ * Entity damage entity event (EvE)
+ */
 public class DarkEntityDamageEntityEvent extends DarkDamageEvent {
 
     public DarkEntityDamageEntityEvent(DarkEntity damager, DarkEntity damaged, ItemStack item, DarkDamageAction action, HashMap<DamageType, Double> damageMap) {

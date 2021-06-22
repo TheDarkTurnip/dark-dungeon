@@ -11,6 +11,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
+/**
+ * Factory for generating Dark Items
+ */
 public class DarkItemFactory {
 
     public static ItemStack getRandomItem() {

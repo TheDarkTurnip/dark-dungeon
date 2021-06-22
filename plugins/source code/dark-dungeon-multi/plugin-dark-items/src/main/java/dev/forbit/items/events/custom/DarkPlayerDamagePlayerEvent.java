@@ -5,6 +5,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
+/**
+ * Player damages player event (PvP)
+ */
 public class DarkPlayerDamagePlayerEvent extends DarkDamageEvent {
 
     public DarkPlayerDamagePlayerEvent(DarkPlayer damager, DarkPlayer damaged, ItemStack item, DarkDamageAction action, HashMap<DamageType, Double> damageMap) {

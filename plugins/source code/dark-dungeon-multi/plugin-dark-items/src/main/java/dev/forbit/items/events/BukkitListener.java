@@ -33,7 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Handles all listening events
+ */
 public class BukkitListener implements Listener {
+    // REFACTOR seperate into own listening classes?
     static DarkItems main;
     @Getter private final HashMap<Player, Integer> cooldown = new HashMap<>();
     private final HashMap<Player, Integer> notifyCooldown = new HashMap<>();

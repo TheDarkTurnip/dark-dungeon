@@ -1,5 +1,8 @@
 package dev.forbit.items.events.custom;
 
+/**
+ * The damage source
+ */
 public enum DarkDamageAction {
     MELEE,
     RANGED,

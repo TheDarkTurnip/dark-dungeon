@@ -11,6 +11,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Helper class for entities
+ */
 public class DarkEntity {
 
     @Getter @Setter transient LivingEntity entity;

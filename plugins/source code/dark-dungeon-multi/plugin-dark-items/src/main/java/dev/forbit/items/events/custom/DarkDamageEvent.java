@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
+/**
+ * Parent event for each dark damage event
+ */
 public abstract class DarkDamageEvent extends Event {
 
     @Getter @Setter boolean cancelled = false;

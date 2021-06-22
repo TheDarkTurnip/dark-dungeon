@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * API Class for dealing with DarkItems and ItemStacks
+ */
 public class DarkItemAPI {
-
-
 
     /* NBT API WRAPPERS */
     public ItemStack NBTInfuse(DarkItem darkItem, ItemStack item) {

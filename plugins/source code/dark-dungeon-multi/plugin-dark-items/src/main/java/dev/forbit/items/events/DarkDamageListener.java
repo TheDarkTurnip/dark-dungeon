@@ -25,6 +25,9 @@ import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 
+/**
+ * Handles listening on dark damage events
+ */
 public class DarkDamageListener implements Listener {
     DarkItems main;
 

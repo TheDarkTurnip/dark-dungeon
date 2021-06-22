@@ -35,6 +35,10 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+/**
+ * The manager of mob effects
+ * @see EffectType
+ */
 public class MobEffects implements Listener {
     private static final HashMap<LivingEntity, ArrayList<MobEffect>> effectMap = new HashMap<>();
     private static final HashMap<LivingEntity, Hologram> hologramMap = new HashMap<>();

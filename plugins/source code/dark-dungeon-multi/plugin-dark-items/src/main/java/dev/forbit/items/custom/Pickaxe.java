@@ -9,6 +9,9 @@ import dev.forbit.library.Utils;
 import dev.forbit.library.rarity.Rarity;
 import org.bukkit.Material;
 
+/**
+ * Pickaxe that breaks ores and spawners
+ */
 public class Pickaxe extends DarkItem implements Nameable, Loreable, Raritable {
 
     public Pickaxe(Material material) {
